@@ -1,0 +1,20 @@
+    var body = req.body;
+
+    var options = {
+        query: body.keyword,
+        start: body.startPage,
+        display: body.displayNum,
+        sort : 'sim'
+    } 
+    
+    request.get({
+        url: naver_host,
+        qs : options,
+        headers:{
+            'X-Naver-Client-Id':NAVER_CLIENT_ID,
+            'X-Naver-Client-Secret':NAVER_CLIENT_SECRET
+        }
+    }, function(err, res, body) {
+        console.log(res.statusCode);
+        console.log(body);
+    });

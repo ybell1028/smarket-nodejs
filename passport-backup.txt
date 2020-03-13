@@ -1,0 +1,136 @@
+var express = require('express');
+var router = express.Router();
+var session = require('express-session');
+var LocalStrategy = require('passport-local').Strategy;
+var bcryptjs = require('bcryptjs');
+var passport = require('passport');
+
+var mysql_dbc = require('../common/db_conf')();
+var pool = mysql_dbc.init();
+
+passport.serializeUser(function (user, done) {
+    console.log('passport session save: ', user.id);
+    done(null, user.id);
+});
+  
+  passport.deserializeUser(function (id, done) {
+    console.log('passport session get id: ', id);
+    done(null, id);
+});
+
+
+passport.use('local-register', new LocalStrategy({
+    usernameField: 'id',
+    passwordField: 'password',
+    nameField: 'name',
+    passReqToCallback: true
+}, function (req, id, password, name, done) {
+    pool.getConnection(function (err, conn) {
+        if (err) {
+            if (conn) {
+                conn.release(); // 반드시 해제 해야합니다.
+            }
+            res.status(500);
+            res.json({ success: false, message: err });
+        }
+        console.log('데이터베이스 연결 스레드 아이디 : ' + conn.threadId);
+        conn.query('select * from users where id = ?', [id], function (err, rows) {
+            if (err) return done(err);
+
+            if (rows.length) {
+                console.log('existed user');
+                return done(null, false, {
+                    message: 'your email is already used'
+                });
+            }
+            else {
+                var exec = conn.query('insert into users (id, hashed_password, name) values (?, ?, ?)',
+                    [id, password, name], function (err, result) {
+                        conn.release(); // 반드시 해제해야합니다.
+                        console.log('실행 대상 SQL : ' + exec.sql);
+
+                        if (err) {
+                            console.log('SQL 실행 시 오류 발생함.');
+                            console.dir(err);
+
+                            res.status(500);
+                            res.json({ success: false, message: err });
+                        }
+                        else {
+                            console.log('데이터 삽입됨.');
+                            return done(null, {
+                                'id': id,
+                                'num': result.insertId
+                            });
+                        }
+                    }
+                );
+            }
+            conn.on('error', function (err) {
+                console.log('데이터베이스 연결 시 에러 발생함.');
+                console.dir(err);
+                res.status(500);
+                res.json({success:false, message:err});
+            });
+        });
+    });
+}));
+
+
+router.post('/register', passport.authenticate('local-register',{
+    successRedirect: '/main',
+    failureRedirect: '/join',
+    failureFlash: true
+}));
+
+router.post('/login', function(req, res, next){
+    console.log('사용자 로그인 호출됨.')
+
+    var userId = req.body.id;
+    var userPassword = req.body.password;
+
+    console.log('요청 파라미터 : ' + userId + ', ' + userPassword);
+    var hash = bcryptjs.hashSync(userPassword, 10);
+    console.log(hash); // 패스워드 암호화
+
+    pool.getConnection(function(err, conn){
+        if(err){
+            if(conn){
+                conn.release();//반드시 해제
+            }
+            res.status(500);
+            res.json({success:false, message:err});
+        }
+        console.log('데이터베이스 연결 스레드 아이디 : ' + conn.threadId);
+
+        //SQL문 실행
+        var exec = conn.query('select * from users where UserId = ?', userId, function(err, result){
+            if(err){
+                console.log('SQL 실행 시 오류 발생함.');
+                console.dir(err);
+
+                res.status(500);
+                res.json({success:false, message:err});
+            }
+            
+            else {
+                console.log(result);
+                if(result.length == 0){
+                    res.json({success:false, message:'해당 Email이 존재하지 않습니다.'});
+                }
+                else {
+                    //bcrypt의 compareSync 메서드를 통해서 로그인 폼에서 넘어온 패스워드와 데이터베이스의 패스워드가 일치하는지 여부를 판단.
+                    if(!bcryptjs.compareSync(result[0].UserPwd, hash)){
+                        res.json({success:false, message:'비밀번호가 일치하지 않습니다.'});
+                    }
+                    else {
+                        res.json({success:true});
+                    }
+                }
+            }
+        });
+    });
+});
+
+
+module.exports = router;
