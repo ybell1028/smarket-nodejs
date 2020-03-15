@@ -8,6 +8,7 @@ cors = require('cors');
 /*라우터*/
 var index = require('./routes/index');
 var naverApi = require('./routes/api/naver/index');
+var youtubeApi = require('./routes/api/youtube/index');
 /*라우터*/
 
 var app = express();
@@ -32,6 +33,7 @@ app.use(session({
 //라우터 객체를 app 객체에 등록
 app.use('/', index);
 app.use('/naver', naverApi);
+app.use('/youtube', youtubeApi);
 
 
 /* sequelize setting */
