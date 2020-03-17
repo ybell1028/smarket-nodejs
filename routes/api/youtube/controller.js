@@ -11,8 +11,7 @@ exports.search = (req, res) => {
 		key: YOUTUBE_API_KEY,
 		type: "video",
 		maxResults: req.query.maxResults,
-		regionCode: "KR",
-		order: req.query.order
+		regionCode: "KR"
 	};
 
 	var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
