@@ -42,23 +42,6 @@ router.post('/register', function (req, res) {
                         res.json({ success: false, message: err });
                     });
 
-                models.bookmark
-                    .create({
-                        user_id: body.id,
-                        list_name: '기본 북마크',
-                        bookmark_name: null,
-                        url: null
-                    })
-                    .then(function (data) {
-                        console.dir(data);
-                        console.log('기본 북마크 생성됨.');
-                    })
-                    .catch(err => {
-                        console.dir(err);
-                        res.status(500);
-                        res.json({ success: false, message: err });
-                    });
-
                 res.status(201); // 201은 새로운 컨텐츠 만들기에 성공했을 때 사용. POST 메소드에 대한 응답으로 잘 어울림.
                 res.json({ success: true });
             }
@@ -147,7 +130,10 @@ router.get('/logout', function(req,res) {
     }
 });
 
-router.get('/bookmark', function(req, res) {
+router.get('/bookmark', function(req, res) { 
+    // 초기유저에게 디폴드 폴더를 어떻게 제공할 것인가?
+    // 1. 클라이언트에서 기본 폴더를 만들도록 유도하는 방법
+    // 2. 실제 데이터베이스에 존재하진 않으나 클라이언트에서 처음 조회하면 만드는 방식
     console.log('북마크 조회 호출됨.');
 
     if(req.session.user){
@@ -158,6 +144,7 @@ router.get('/bookmark', function(req, res) {
                 where: {user_id: req.session.user.id}
             })
             .then(function (data) {
+                console.dir(data);
                 console.log('북마크 리스트 조회 완료.');
                 res.status(200);
                 res.json(data);
