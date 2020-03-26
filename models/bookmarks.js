@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
     },
-    list_name: { // 북마크 리스트 이름
+    folder_name: { // 북마크 리스트 이름
         type: DataTypes.STRING,
         allowNull: false
     },

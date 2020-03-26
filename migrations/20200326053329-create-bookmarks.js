@@ -12,7 +12,7 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            list_name: {
+            folder_name: {
                 type: Sequelize.STRING(20),
                 allowNull: false
             },

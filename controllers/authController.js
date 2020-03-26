@@ -2,6 +2,9 @@ var models = require("../models");
 var util = require('../middleware/util');
 var crypto = require('crypto');
 
+//1. 요청할 URL) http://localhost:3000/api/auth/login
+//2. 북마크를 만드는 유저의 토큰을 headers 탭에
+//key에 [x-access-token], value에 [토큰 값]을 입력
 
 exports.login = async (req, res, next) => {
     console.log('사용자 로그인 호출됨.');
@@ -12,7 +15,7 @@ exports.login = async (req, res, next) => {
     else {
         models.user
             .findOne({
-                where: { user_id: req.body.userid }
+                where: { user_id: req.body.user_id }
             }).then(async function (data) { // 레코드의 실제 값은 dataValues라는 프로퍼티 안에 있음
                 let dbPassword = data.dataValues.password;
                 let inputPassword = req.body.password;
@@ -69,16 +72,6 @@ exports.login = async (req, res, next) => {
 //     }
 // };
 
-exports.me = (req, res) => {
-    models.user
-        .findOne({
-            where: { user_id: req.decoded.user_id }
-        }).then(function (data) {
-            res.status(200).json(data);
-        }).catch(function (err){
-            res.status(401).json(util.successFalse(err));
-        });
-}
 
 exports.refresh = (req, res) => {
     models.user

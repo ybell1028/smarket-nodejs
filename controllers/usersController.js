@@ -27,7 +27,7 @@ exports.userRegister = (req, res) => {
     console.log('사용자 등록 호출됨.');
     models.user
         .findOne({
-            where: {user_id: req.body.userid}
+            where: {user_id: req.body.user_id}
         })
         .then((data) => { //ID 중복 검사
             if (!(data == null || data == undefined)) {
@@ -41,7 +41,7 @@ exports.userRegister = (req, res) => {
 
                 models.user
                     .create({
-                        user_id: req.body.userid,
+                        user_id: req.body.user_id,
                         password: hashPassword,
                         name: req.body.name,
                         salt: salt
@@ -94,11 +94,11 @@ exports.userPasswordConfirm = (req, res) => {
         });
 }
 
-exports.userInformation = (req, res) => {
+exports.userDetail = (req, res) => {
     console.log('사용자 정보 조회 호출됨.');
     models.user
         .findOne({
-            where: {userid : req.param.userid}
+            where: {user_id : req.param.userid}
         }).then((data) => {
             res.status(200);
             res.json(util.successTrue(data));

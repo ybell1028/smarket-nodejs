@@ -67,7 +67,7 @@ util.generateToken = function(data){
             user_id: data.dataValues.user_id
         }, secretObj.secret, {
             algorithm : 'HS256',
-            expiresIn: '1h'
+            expiresIn: '1d'
         }, (err, token) => {
             if (err) 
                 return res.json(util.successFalse(err));
@@ -107,7 +107,7 @@ util.checkPermission = (req, res, next) => {
             if (data.dataValues.user_id === req.decoded.user_id)
                 next();
 
-            else res.json(util.successFalse(null, "you don't have permission"));
+            else res.status(401).json(util.successFalse(null, "you don't have permission"));
         }).catch((err) => {
             res.status(401).json(util.successFalse(err));
         })
