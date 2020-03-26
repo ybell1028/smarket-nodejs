@@ -6,9 +6,7 @@ session = require('express-session'),
 cors = require('cors');
 
 /*라우터*/
-var index = require('./routes/index');
-var naverApi = require('./routes/api/naver/index');
-var youtubeApi = require('./routes/api/youtube/index');
+var api = require('./routes/api');
 /*라우터*/
 
 var app = express();
@@ -31,10 +29,7 @@ app.use(session({
 
 
 //라우터 객체를 app 객체에 등록
-app.use('/', index);
-app.use('/naver', naverApi);
-app.use('/youtube', youtubeApi);
-
+app.use('/api', api);
 
 /* sequelize setting */
 const models = require("./models/index.js");
