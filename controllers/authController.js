@@ -40,7 +40,7 @@ exports.login = async (req, res, next) => {
                     res.status(409);
                     res.json(util.successFalse(null, '패스워드 불일치. 로그인 실패.'));
                 }
-            }).catch(err => {
+            }).catch(err => { // 수정 필요
                 console.log('ID가 존재하지 않음. 로그인 실패.');
                 res.status(409);
                 res.json(util.successFalse(err, 'ID가 존재하지 않음. 로그인 실패.'));
