@@ -46,7 +46,7 @@ util.loginValidation = function (req, res) {
             errors:{}
         };
 
-        if(!req.body.userid){
+        if(!req.body.user_id){
             isValid = false;
             validationError.errors.userid = { message:'UserId is required!'};
         }
