@@ -87,3 +87,49 @@ exports.refresh = (req, res) => {
             res.status(401).json(util.successFalse(err, 'ID가 존재하지 않음. 토큰 재발급 실패.'));
         });
 }
+
+exports.isExistId = (req, res) => {
+    console.log('ID 중복 검사 호출됨.');
+    models.user
+        .findOne({
+            where: { user_id: req.body.user_id }
+        })
+        .then((data) => { //ID 중복 검사
+            if (!(data == null || data == undefined)){
+                res.status(409);
+                res.json(util.successFalse(null, '이미 존재하는 ID 입니다.'));
+            }
+            else {
+                res.status(200);
+                res.json(util.successTrue(null));
+            }
+        }).catch(err => {
+            console.log('DB에서 ID 조회 실패');
+            console.dir(err);
+            res.status(500)
+            res.json(this.successFalse(err, 'DB에서 ID 조회 실패'));
+        });
+}
+
+exports.isExistNickname = (req, res) => {
+    console.log('닉네임 중복 검사 호출됨.');
+    models.user
+        .findOne({
+            where: { nickname: req.body.nickname }
+        })
+        .then((data) => { //ID 중복 검사
+            if (!(data == null || data == undefined)){
+                res.status(409);
+                res.json(util.successFalse(null, '이미 존재하는 닉네임입니다.'));
+            }
+            else {
+                res.status(200);
+                res.json(util.successTrue(null));
+            }
+        }).catch(err => {
+            console.log('DB에서 nickname 조회 실패');
+            console.dir(err);
+            res.status(500)
+            res.json(this.successFalse(err, 'DB에서 nickname 조회 실패'));
+        });
+}
