@@ -12,14 +12,9 @@ exports.sendPush = (req, res) => {
   
   // 보낼 메시지를 작성하는 부분 입니다.
   var message = {
-
-    notification: {
-      title: '포그라운드 메시지',
-      body: '푸시알람입니다.'
-    },
     data: {
-      score: '850',
-      time: '2:45'
+      title: '거기 집게리아 맞죠',
+      body: '아뇨 뚱인데요'
     },
     token: pushToken
   
