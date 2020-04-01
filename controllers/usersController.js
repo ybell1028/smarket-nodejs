@@ -6,7 +6,7 @@ exports.userList = (req, res) => {
     console.log('사용자 리스트 조회 호출됨.');
     models.user
         .findAll({
-            attributes: ['user_id', 'name']
+            attributes: ['user_id', 'name', 'nickname', 'phonenum']
         }).then((data) => { //ID 중복 검사
             if (data == null || data == undefined) {
                 res.status(409);
@@ -25,44 +25,27 @@ exports.userList = (req, res) => {
 
 exports.userRegister = (req, res) => {
     console.log('사용자 등록 호출됨.');
+    let inputPassword = req.body.password;
+    let salt = Math.round((new Date().valueOf() * Math.random())) + "";
+    let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
+
     models.user
-        .findOne({
-            where: {user_id: req.body.user_id}
+        .create({
+            user_id: req.body.user_id,
+            password: hashPassword,
+            name: req.body.name,
+            salt: salt
         })
-        .then((data) => { //ID 중복 검사
-            if (!(data == null || data == undefined)) {
-                res.status(409); // 409는 서버가 요청을 처리하는 과정에서 충돌이 발생한 경우입니다. (회원가입을 했는데 이미 사용하고 있는 아이디인 경우, 비밀번호가 틀린 경우 등)
-                res.json({ success: false, message: '이 ID는 이미 사용중입니다.' });
-            }
-            else {
-                let inputPassword = req.body.password;
-                let salt = Math.round((new Date().valueOf() * Math.random())) + "";
-                let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
-
-                models.user
-                    .create({
-                        user_id: req.body.user_id,
-                        password: hashPassword,
-                        name: req.body.name,
-                        salt: salt
-                    })
-                    .then(function (data) {
-                        console.log('계정 데이터 삽입됨.');
-                        console.dir(data);
-                        res.status(201);
-                        res.json(util.successTrue(token));
-                    })
-                    .catch(err => {
-                        console.dir(err);
-                        res.status(500)
-                        res.json(util.successFalse(err));
-                    });
-
-            }
-        }).catch(err => {
-            console.log('DB에서 ID 조회 실패');
+        .then(function (data) {
+            console.log('계정 데이터 삽입됨.');
+            console.dir(data);
+            res.status(201);
+            res.json(util.successTrue(token));
+        })
+        .catch(err => {
             console.dir(err);
-            res.status(500).json(util.successFalse(err, 'DB에서 ID 조회 실패'));
+            res.status(500)
+            res.json(util.successFalse(err));
         });
 };
 
