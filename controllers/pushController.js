@@ -18,8 +18,8 @@ exports.sendPush = (req, res) => {
       body: '푸시알람입니다.'
     },
     data: {
-      score: '850',
-      time: '2:45'
+      title:"fucking",
+      body:"asshole"
     },
     token: pushToken
   
