@@ -25,13 +25,27 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      nickname: {
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      phonenum: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      admin: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false
       }
     });
   },

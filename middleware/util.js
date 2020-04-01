@@ -64,7 +64,8 @@ util.loginValidation = function (req, res) {
 util.generateToken = function(data){
     return new Promise((resolve, reject) => {
         jwt.sign({
-            user_id: data.dataValues.user_id
+            user_id: data.dataValues.user_id,
+            admin: data.dataValues.admin
         }, secretObj.secret, {
             algorithm : 'HS256',
             expiresIn: '1d'
@@ -92,6 +93,28 @@ util.isLoggedin = function (req, res, next) {
                 console.dir(decoded);
                 req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
                 next();
+            }
+        });
+    }
+};
+
+util.isAdmin = function (req, res, next) {
+    var token = req.headers['x-access-token'] || req.query.token;
+    //token 변수에 토큰이 없다면
+    if (!token) return res.json(util.successFalse(null, 'token is required!'));
+    //토큰이 있다면
+    else {
+        jwt.verify(token, secretObj.secret, function (err, decoded) {
+            if (err) return res.status(401).json(util.successFalse(err));
+            else {
+                if(decoded.admin) {
+                    console.dir(decoded);
+                    req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
+                    next();
+                }
+                else {
+                    res.status(401).json(util.successFalse(null, '권한이 없습니다.')); // 권한 없음
+                }
             }
         });
     }
