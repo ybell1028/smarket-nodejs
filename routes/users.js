@@ -14,7 +14,7 @@ router.post('/', usersController.userRegister);
 //3. body에 입력해야하는 JSON 포맷
 //1)password 
 router.post('/passwordconfirm', util.isLoggedin, usersController.userPasswordConfirm);
-router.get('/', util.isLoggedin, usersController.userList);
+router.get('/', util.isAdmin, usersController.userList);
 
 //1. get으로 요청할 URL) http://localhost:3000/api/users/tpgus123(사용자 id)
 //2. util.isLoggedin(로그인 되어있는지 확인하는 미들웨어) -> 헤더에 토큰 넣어야함

@@ -34,13 +34,16 @@ exports.userRegister = (req, res) => {
             user_id: req.body.user_id,
             password: hashPassword,
             name: req.body.name,
+            nickname: req.body.nickname,
+            phonenum: req.body.phonenum,
+            admin: req.body.admin,
             salt: salt
         })
         .then(function (data) {
             console.log('계정 데이터 삽입됨.');
             console.dir(data);
             res.status(201);
-            res.json(util.successTrue(token));
+            res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
