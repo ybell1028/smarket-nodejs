@@ -28,7 +28,6 @@ exports.userRegister = (req, res) => {
     let inputPassword = req.body.password;
     let salt = Math.round((new Date().valueOf() * Math.random())) + "";
     let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
-
     models.user
         .create({
             user_id: req.body.user_id,
@@ -47,6 +46,7 @@ exports.userRegister = (req, res) => {
         })
         .catch(err => {
             console.dir(err);
+            console.log('계정 데이터 삽입중 에러.');
             res.status(500)
             res.json(util.successFalse(err));
         });

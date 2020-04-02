@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 var models = require("../models");
-var secretObj = require("../config/jwt");
+var jwtConfig = require("../config/jwt");
 
 var util = {};
 
@@ -61,14 +61,14 @@ util.loginValidation = function (req, res) {
     });
 }
 
-util.generateToken = function(data){
+util.generateAccessToken = function(req, res){
     return new Promise((resolve, reject) => {
         jwt.sign({
-            user_id: data.dataValues.user_id,
-            admin: data.dataValues.admin
-        }, secretObj.secret, {
+            user_id: req.body.user_id,
+            admin: req.body.admin
+        }, jwtConfig.accessTokenSecret, {
             algorithm : 'HS256',
-            expiresIn: '1d'
+            expiresIn: jwtConfig.accessTokenLife
         }, (err, token) => {
             if (err) 
                 return res.json(util.successFalse(err));
@@ -77,18 +77,72 @@ util.generateToken = function(data){
     });
 }
 
-// 토큰 유효성 검사 미들웨어
-// 미들웨어로 token이 있는지 없는지 확인하고 token이 있다면 jwt.verify 함수를 이용해서 토큰 hash를
-// 확인하고 토큰에 들어있는 정보를 해독합니다. 해독한 정보는 req.decoded에 저장하고 있으며
-// 이후 로그인 유무는 decoded가 있는지 없는지를 통해 알 수 있습니다.
+
+util.generateRefreshToken = function(req, res){
+    return new Promise((resolve, reject) => {
+        jwt.sign({
+            user_id: req.body.user_id,
+            admin: req.body.admin
+        }, jwtConfig.refreshTokenSecret, {
+            algorithm : 'HS256',
+            expiresIn: jwtConfig.refreshTokenLife
+        }, (err, token) => {
+            if (err) 
+                return res.json(util.successFalse(err));
+            else resolve(token);
+        });
+    });
+}
+
+
+util.createPayload = function(req, res){
+    return new Promise((resolve, reject) => {
+        req.payload = {
+            user_id: req.body.user_id,
+            admin: req.body.admin
+        }
+        if(req.payload === null || req.payload === undefined)
+            reject();
+        else
+            resolve()
+    });
+}
+
+
 util.isLoggedin = function (req, res, next) {
     var token = req.headers['x-access-token'] || req.query.token;
     //token 변수에 토큰이 없다면
     if (!token) return res.json(util.successFalse(null, 'token is required!'));
     //토큰이 있다면
     else {
-        jwt.verify(token, secretObj.secret, function (err, decoded) {
-            if (err) return res.status(401).json(util.successFalse(err));
+        jwt.verify(token, jwtConfig.accessTokenSecret, function (err, decoded) {
+            if (err.name === "TokenExpiredError") { //만약 토큰이 만료 되었다면
+                req.body = jwt.verify(token, jwtConfig.accessTokenSecret, {ignoreExpiration: true} );
+                console.dir(req.body);
+                // 페이로드를 req에 저장
+                models.user
+                    .findOne({
+                        attributes: ['refresh_token']
+                    },{
+                        where: {user_id : req.body.user_id}
+                    }).then((data) => {
+                        jwt.verify(data, jwtConfig.refreshTokenSecret, function (err, decoded) {
+                            if (err) return res.status(401).json(util.successFalse(err)); // refresh token이 만료됐을때
+                            else {
+                                var newAccessToken = util.generateAccessToken(req, res)
+                                res.status(201);
+                                res.json(util.successTrue(newAccessToken));
+                            }
+                        })
+                    }).catch((err) => {
+                        console.log('DB에서 사용자 정보 조회 실패');
+                        console.dir(err);
+                        res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 조회 실패'));
+                    });
+
+            } else if (err) {
+                return res.status(401).json(util.successFalse(err));
+            }
             else {
                 console.dir(decoded);
                 req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
@@ -104,7 +158,7 @@ util.isAdmin = function (req, res, next) {
     if (!token) return res.json(util.successFalse(null, 'token is required!'));
     //토큰이 있다면
     else {
-        jwt.verify(token, secretObj.secret, function (err, decoded) {
+        jwt.verify(token, jwtConfig.accessTokenSecret, function (err, decoded) {
             if (err) return res.status(401).json(util.successFalse(err));
             else {
                 if(decoded.admin) {

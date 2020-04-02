@@ -22,10 +22,12 @@ exports.login = async (req, res, next) => {
                 let salt = data.dataValues.salt;
                 let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
 
+                req.body.admin = data.dataValues.admin;
+
                 if (dbPassword === hashPassword) {
                     console.log('비밀번호가 일치함.');
                     console.log(data.dataValues.user_id + ' 로그인 성공.');
-                    var token = await util.generateToken(data);
+                    var token = await util.generateAccessToken(req, res);
                     console.log('토큰 생성됨.');
                     res.cookie('token', token, {
                         expires: new Date(Date.now() + token.expiresIn),
@@ -42,6 +44,7 @@ exports.login = async (req, res, next) => {
                 }
             }).catch(err => { // 수정 필요
                 console.log('ID가 존재하지 않음. 로그인 실패.');
+                console.dir(err);
                 res.status(409);
                 res.json(util.successFalse(err, 'ID가 존재하지 않음. 로그인 실패.'));
             });
