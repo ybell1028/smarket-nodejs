@@ -1,10 +1,8 @@
 var models = require("../models");
 var util = require('../middleware/util');
+var jwt = require('jsonwebtoken');
+var jwtConfig = require("../config/jwt");
 var crypto = require('crypto');
-
-//1. 요청할 URL) http://localhost:3000/api/auth/login
-//2. 북마크를 만드는 유저의 토큰을 headers 탭에
-//key에 [x-access-token], value에 [토큰 값]을 입력
 
 exports.login = async (req, res, next) => {
     console.log('사용자 로그인 호출됨.');
@@ -16,7 +14,7 @@ exports.login = async (req, res, next) => {
         models.user
             .findOne({
                 where: { user_id: req.body.user_id }
-            }).then(async function (data) { // 레코드의 실제 값은 dataValues라는 프로퍼티 안에 있음
+            }).then(async function (data) {
                 let dbPassword = data.dataValues.password;
                 let inputPassword = req.body.password;
                 let salt = data.dataValues.salt;
@@ -27,22 +25,30 @@ exports.login = async (req, res, next) => {
                 if (dbPassword === hashPassword) {
                     console.log('비밀번호가 일치함.');
                     console.log(data.dataValues.user_id + ' 로그인 성공.');
-                    var token = await util.generateAccessToken(req, res);
+                    var tokens = {
+                        accessToken : await util.generateAccessToken(req, res),
+                        refreshToken : await util.generateRefreshToken(req, res)
+                    }
                     console.log('토큰 생성됨.');
-                    res.cookie('token', token, {
-                        expires: new Date(Date.now() + token.expiresIn),
+                    res.cookie('accessToken', tokens.accessToken, {
+                        expires: new Date(Date.now() + tokens.accessToken.expiresIn),
+                        secure: true,
+                        httpOnly: true 
+                    });
+                    res.cookie('refreshToken', tokens.refreshToken, {
+                        expires: new Date(Date.now() + tokens.refreshToken.expiresIn),
                         secure: true,
                         httpOnly: true 
                     });
                     res.status(200);
-                    res.json(util.successTrue(token));
+                    res.json(util.successTrue(tokens));
                 }
                 else {
                     console.log('비밀번호 불일치. 로그인 실패.');
                     res.status(409);
                     res.json(util.successFalse(null, '패스워드 불일치. 로그인 실패.'));
                 }
-            }).catch(err => { // 수정 필요
+            }).catch(async err => {
                 console.log('ID가 존재하지 않음. 로그인 실패.');
                 console.dir(err);
                 res.status(409);
@@ -75,21 +81,41 @@ exports.login = async (req, res, next) => {
 //     }
 // };
 
+exports.refresh = (req, res) => { // 만약 토큰을 넣지 않고 요청한다면?
+    var refreshToken = req.headers['x-refresh-token'];
+    jwt.verify(refreshToken, jwtConfig.refreshTokenSecret, function (err, decoded) {
+        if (err) return res.status(401).json(util.successFalse(err)); // refresh token이 만료됐을때
+        else {
+            req.body = decoded;
 
-exports.refresh = (req, res) => {
-    models.user
-        .findOne({
-            where: { user_id: req.decoded.user_id }
-        }).then(async function (data) {
-            var token = await util.generateToken(data);
-            console.log('토큰 재발급 완료.');
-            res.status(200);
-            res.json(util.successTrue(token));
-        }).catch(function (err){
-            console.log('ID가 존재하지 않음. 토큰 재발급 실패.');
-            res.status(401).json(util.successFalse(err, 'ID가 존재하지 않음. 토큰 재발급 실패.'));
-        });
+            models.user
+                .findOne({
+                    where: { user_id: decoded.user_id }
+                }).then(async (data) => {
+                    var newAccessToken = await util.generateAccessToken(req, res);
+                    res.status(201);
+                    res.json(util.successTrue(newAccessToken));
+                }).catch((err) => {
+                    console.log('DB에서 사용자 정보 조회 실패');
+                    console.dir(err);
+                    res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 조회 실패'));
+                });
+        }
+    });
 }
+
+// exports.refreshToken = (req, res) => { // 리프레시 토큰 갱신
+//     var refreshToken = req.headers['x-refresh-token'];
+//     jwt.verify(refreshToken, jwtConfig.refreshTokenSecret, function (err, decoded) {
+//         if (err) return res.status(401).json(util.successFalse(err)); // refresh token이 만료됐을때
+//         else {
+//             var newAccessToken = util.generateAccessToken(req, res)
+//             res.status(201);
+//             res.json(util.successTrue(newAccessToken));
+//         }
+//     });
+// }
+
 
 exports.isExistId = (req, res) => {
     console.log('ID 중복 검사 호출됨.');

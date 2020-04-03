@@ -23,33 +23,39 @@ exports.userList = (req, res) => {
         });
 }
 
-exports.userRegister = (req, res) => {
+exports.userRegister = async (req, res) => {
     console.log('사용자 등록 호출됨.');
-    let inputPassword = req.body.password;
-    let salt = Math.round((new Date().valueOf() * Math.random())) + "";
-    let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
-    models.user
-        .create({
-            user_id: req.body.user_id,
-            password: hashPassword,
-            name: req.body.name,
-            nickname: req.body.nickname,
-            phonenum: req.body.phonenum,
-            admin: req.body.admin,
-            salt: salt
-        })
-        .then(function (data) {
-            console.log('계정 데이터 삽입됨.');
-            console.dir(data);
-            res.status(201);
-            res.json(util.successTrue(data));
-        })
-        .catch(err => {
-            console.dir(err);
-            console.log('계정 데이터 삽입중 에러.');
-            res.status(500)
-            res.json(util.successFalse(err));
-        });
+    const registerValidation = await util.registerValidation(req, res);
+    if (!registerValidation){
+        console.log('사용자 등록 실패');
+    }
+    else {
+        let inputPassword = req.body.password;
+        let salt = Math.round((new Date().valueOf() * Math.random())) + "";
+        let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
+        models.user
+            .create({
+                user_id: req.body.user_id,
+                password: hashPassword,
+                name: req.body.name,
+                nickname: req.body.nickname,
+                phonenum: req.body.phonenum,
+                admin: req.body.admin,
+                salt: salt
+            })
+            .then(function (data) {
+                console.log('계정 데이터 삽입됨.');
+                console.dir(data);
+                res.status(201);
+                res.json(util.successTrue(data));
+            })
+            .catch(err => {
+                console.dir(err);
+                console.log('계정 데이터 삽입중 에러.');
+                res.status(500)
+                res.json(util.successFalse(err));
+            });
+    }
 };
 
 exports.userPasswordConfirm = (req, res) => {
@@ -82,9 +88,10 @@ exports.userPasswordConfirm = (req, res) => {
 
 exports.userDetail = (req, res) => {
     console.log('사용자 정보 조회 호출됨.');
+    console.log(req.params.userid);
     models.user
         .findOne({
-            where: {user_id : req.param.userid}
+            where: {user_id : req.params.userid}
         }).then((data) => {
             res.status(200);
             res.json(util.successTrue(data));
@@ -131,7 +138,7 @@ exports.userWithdraw = (req, res) => {
     console.log('사용자 탈퇴 호출됨.');
     models.user
         .findOneAndRemove({
-            where: {user_id : req.param.userid}
+            where: {user_id : req.params.userid}
         }).then((data) => {
             res.status(200);
             res.json(util.successTrue(data));
