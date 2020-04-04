@@ -1,14 +1,13 @@
 var jwt = require('jsonwebtoken');
 var models = require("../models");
-var secretObj = require("../config/jwt");
+var jwtConfig = require("../config/jwt");
 
 var util = {};
 
 util.successTrue = function (data) {
     return {
         success: true,
-        message: null,
-        errors: null,
+        timestamp: new Date(Date.now()),
         data: data
     };
 };
@@ -17,23 +16,26 @@ util.successFalse = function (err, message) {
     if (!err && !message) message = 'data not found';
     return {
         success: false,
+        timestamp: new Date(Date.now()),
         message: message,
         errors: (err) ? util.parseError(err) : null,
         data: null
     };
 };
 
-util.parseError = function (errors) {
+util.parseError = function (err) {
     var parsed = {};
-    if (errors.name == 'ValidationError') {
-        for (var name in errors.errors) {
-            var validationError = errors.errors[name];
+    if (err.name == 'ValidationError') {
+        for (var name in err.errors) {
+            console.log(name); 
+            var validationError = err.errors[name]; ;//name = user_id
             parsed[name] = { message: validationError.message };
         }
-    } else if (errors.code == '11000' && errors.errmsg.indexOf('username') > 0) {
-        parsed.username = { message: 'This username already exists!' };
-    } else {
-        parsed.unhandled = errors;
+    } else if (errors.name == 'TypeError'){
+
+    }
+     else {
+        parsed.unhandled = err;
     }
     return parsed;
 };
@@ -48,27 +50,63 @@ util.loginValidation = function (req, res) {
 
         if(!req.body.user_id){
             isValid = false;
-            validationError.errors.userid = { message:'UserId is required!'};
+            validationError.errors.user_id = { message:'user_id is required!'};//name = user_id
         }
         if(!req.body.password){
             isValid = false;
-            validationError.errors.password = {message:'Password is required!'};
+            validationError.errors.password = {message:'password is required!'};
         }
         
-        if(!isValid) res.json(util.successFalse(validationError));
+        if(!isValid) res.status(400).json(util.successFalse(validationError));
 
         resolve(isValid);
     });
 }
 
-util.generateToken = function(data){
+
+util.registerValidation = function (req, res) {
+    return new Promise(function(resolve, reject){
+        var isValid = true;
+        var validationError = {
+            name:'ValidationError',
+            errors:{}
+        };
+
+        if(!req.body.user_id){
+            isValid = false;
+            validationError.errors.userid = { message:'user_id is required!'};
+        }
+        if(!req.body.password){
+            isValid = false;
+            validationError.errors.password = {message:'password is required!'};
+        }
+        if(!req.body.name){
+            isValid = false;
+            validationError.errors.name = {message:'name is required!'};
+        }
+        if(!req.body.nickname){
+            isValid = false;
+            validationError.errors.nickname = {message:'nickname is required!'};
+        }
+        if(!req.body.phonenum){
+            isValid = false;
+            validationError.errors.password = {message:'phonenum is required!'};
+        }
+        
+        if(!isValid) res.status(400).json(util.successFalse(validationError));
+
+        resolve(isValid);
+    });
+}
+
+util.generateAccessToken = function(req, res){
     return new Promise((resolve, reject) => {
         jwt.sign({
-            user_id: data.dataValues.user_id,
-            admin: data.dataValues.admin
-        }, secretObj.secret, {
+            user_id: req.body.user_id,
+            admin: req.body.admin
+        }, jwtConfig.accessTokenSecret, {
             algorithm : 'HS256',
-            expiresIn: '1d'
+            expiresIn: jwtConfig.accessTokenLife
         }, (err, token) => {
             if (err) 
                 return res.json(util.successFalse(err));
@@ -77,17 +115,32 @@ util.generateToken = function(data){
     });
 }
 
-// 토큰 유효성 검사 미들웨어
-// 미들웨어로 token이 있는지 없는지 확인하고 token이 있다면 jwt.verify 함수를 이용해서 토큰 hash를
-// 확인하고 토큰에 들어있는 정보를 해독합니다. 해독한 정보는 req.decoded에 저장하고 있으며
-// 이후 로그인 유무는 decoded가 있는지 없는지를 통해 알 수 있습니다.
+
+util.generateRefreshToken = function(req, res){
+    return new Promise((resolve, reject) => {
+        jwt.sign({
+            user_id: req.body.user_id,
+            admin: req.body.admin
+        }, jwtConfig.refreshTokenSecret, {
+            algorithm : 'HS256',
+            expiresIn: jwtConfig.refreshTokenLife
+        }, (err, token) => {
+            if (err) 
+                return res.json(util.successFalse(err));
+            else resolve(token);
+        });
+    });
+}
+
+
+
 util.isLoggedin = function (req, res, next) {
     var token = req.headers['x-access-token'] || req.query.token;
     //token 변수에 토큰이 없다면
-    if (!token) return res.json(util.successFalse(null, 'token is required!'));
+    if (!token) return res.json(util.successFalse(null, '로그인이 필요합니다.'));
     //토큰이 있다면
     else {
-        jwt.verify(token, secretObj.secret, function (err, decoded) {
+        jwt.verify(token, jwtConfig.accessTokenSecret, function (err, decoded) {
             if (err) return res.status(401).json(util.successFalse(err));
             else {
                 console.dir(decoded);
@@ -101,10 +154,10 @@ util.isLoggedin = function (req, res, next) {
 util.isAdmin = function (req, res, next) {
     var token = req.headers['x-access-token'] || req.query.token;
     //token 변수에 토큰이 없다면
-    if (!token) return res.json(util.successFalse(null, 'token is required!'));
+    if (!token) return res.json(util.successFalse(null, '관리자 권한이 필요합니다'));
     //토큰이 있다면
     else {
-        jwt.verify(token, secretObj.secret, function (err, decoded) {
+        jwt.verify(token, jwtConfig.accessTokenSecret, function (err, decoded) {
             if (err) return res.status(401).json(util.successFalse(err));
             else {
                 if(decoded.admin) {
