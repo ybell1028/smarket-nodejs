@@ -1,60 +1,54 @@
 var models = require("../models");
 var util = require('../middleware/util');
+var errorhandler = require("../middleware/errorhandler");
 var jwt = require('jsonwebtoken');
 var jwtConfig = require("../config/jwt");
 var crypto = require('crypto');
 
-exports.login = async (req, res, next) => {
-    console.log('사용자 로그인 호출됨.');
-    const loginValidation = await util.loginValidation(req, res);
-    if (!loginValidation){
-        console.log('로그인 실패');
-    }
-    else {
-        models.user
-            .findOne({
-                where: { user_id: req.body.user_id }
-            }).then(async function (data) {
-                let dbPassword = data.dataValues.password;
-                let inputPassword = req.body.password;
-                let salt = data.dataValues.salt;
-                let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
+exports.login = async (req, res) => {
+    models.user
+        .findOne({
+            where: { user_id: req.body.user_id }
+        }).then(async function (data) {
+            let dbPassword = data.dataValues.password;
+            let inputPassword = req.body.password;
+            let salt = data.dataValues.salt;
+            let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
 
-                req.body.admin = data.dataValues.admin;
+            req.body.admin = data.dataValues.admin;
 
-                if (dbPassword === hashPassword) {
-                    console.log('비밀번호가 일치함.');
-                    console.log(data.dataValues.user_id + ' 로그인 성공.');
-                    var tokens = {
-                        accessToken : await util.generateAccessToken(req, res),
-                        refreshToken : await util.generateRefreshToken(req, res)
-                    }
-                    console.log('토큰 생성됨.');
-                    res.cookie('accessToken', tokens.accessToken, {
-                        expires: new Date(Date.now() + tokens.accessToken.expiresIn),
-                        secure: true,
-                        httpOnly: true 
-                    });
-                    res.cookie('refreshToken', tokens.refreshToken, {
-                        expires: new Date(Date.now() + tokens.refreshToken.expiresIn),
-                        secure: true,
-                        httpOnly: true 
-                    });
-                    res.status(200);
-                    res.json(util.successTrue(tokens));
+            if (dbPassword === hashPassword) {
+                console.log('비밀번호가 일치함.');
+                console.log(data.dataValues.user_id + ' 로그인 성공.');
+                var tokens = {
+                    accessToken: await util.generateAccessToken(req, res),
+                    refreshToken: await util.generateRefreshToken(req, res)
                 }
-                else {
-                    console.log('비밀번호 불일치. 로그인 실패.');
-                    res.status(409);
-                    res.json(util.successFalse(null, '패스워드 불일치. 로그인 실패.'));
-                }
-            }).catch(async err => {
-                console.log('ID가 존재하지 않음. 로그인 실패.');
-                console.dir(err);
+                console.log('토큰 생성됨.');
+                res.cookie('accessToken', tokens.accessToken, {
+                    expires: new Date(Date.now() + tokens.accessToken.expiresIn),
+                    secure: true,
+                    httpOnly: true
+                });
+                res.cookie('refreshToken', tokens.refreshToken, {
+                    expires: new Date(Date.now() + tokens.refreshToken.expiresIn),
+                    secure: true,
+                    httpOnly: true
+                });
+                res.status(200);
+                res.json(util.successTrue(tokens));
+            }
+            else {
+                console.log('비밀번호 불일치. 로그인 실패.');
                 res.status(409);
-                res.json(util.successFalse(err, 'ID가 존재하지 않음. 로그인 실패.'));
-            });
-    }
+                res.json(util.successFalse(null, '패스워드 불일치. 로그인 실패.'));
+            }
+        }).catch(async err => {
+            console.log('ID가 존재하지 않음. 로그인 실패.');
+            console.dir(err);
+            res.status(409);
+            res.json(util.successFalse(err, 'ID가 존재하지 않음. 로그인 실패.'));
+        });
 };
 
 // 후에 클라이언트에서 구현해야 할듯
@@ -81,7 +75,7 @@ exports.login = async (req, res, next) => {
 //     }
 // };
 
-exports.refresh = (req, res) => { // 만약 토큰을 넣지 않고 요청한다면?
+exports.refresh = (req, res) => {
     var refreshToken = req.headers['x-refresh-token'];
     jwt.verify(refreshToken, jwtConfig.refreshTokenSecret, function (err, decoded) {
         if (err) return res.status(401).json(util.successFalse(err)); // refresh token이 만료됐을때
@@ -117,7 +111,7 @@ exports.refresh = (req, res) => { // 만약 토큰을 넣지 않고 요청한다
 // }
 
 
-exports.isExistId = (req, res) => {
+exports.checkId = (req, res) => { // 만약 아이디를 쓰지 않는다면?
     console.log('ID 중복 검사 호출됨.');
     models.user
         .findOne({
@@ -140,7 +134,7 @@ exports.isExistId = (req, res) => {
         });
 }
 
-exports.isExistNickname = (req, res) => {
+exports.checkNickname = (req, res) => {
     console.log('닉네임 중복 검사 호출됨.');
     models.user
         .findOne({

@@ -1,5 +1,6 @@
 var jwt = require('jsonwebtoken');
 var models = require("../models");
+var errorhandler = require("../middleware/errorhandler");
 var jwtConfig = require("../config/jwt");
 
 var util = {};
@@ -12,92 +13,17 @@ util.successTrue = function (data) {
     };
 };
 
-util.successFalse = function (err, message) {
-    if (!err && !message) message = 'data not found';
+util.successFalse = function (err, comment) {
+    if (!err && !comment) comment = 'data not found';
+
     return {
         success: false,
         timestamp: new Date(Date.now()),
-        message: message,
-        errors: (err) ? util.parseError(err) : null,
-        data: null
+        name: (err) ? err.name : null,
+        errors: (err) ? errorhandler.parseError(err) : null,
+        comment: comment
     };
 };
-
-util.parseError = function (err) {
-    var parsed = {};
-    if (err.name == 'ValidationError') {
-        for (var name in err.errors) {
-            console.log(name); 
-            var validationError = err.errors[name]; ;//name = user_id
-            parsed[name] = { message: validationError.message };
-        }
-    } else if (errors.name == 'TypeError'){
-
-    }
-     else {
-        parsed.unhandled = err;
-    }
-    return parsed;
-};
-
-util.loginValidation = function (req, res) {
-    return new Promise(function(resolve, reject){
-        var isValid = true;
-        var validationError = {
-            name:'ValidationError',
-            errors:{}
-        };
-
-        if(!req.body.user_id){
-            isValid = false;
-            validationError.errors.user_id = { message:'user_id is required!'};//name = user_id
-        }
-        if(!req.body.password){
-            isValid = false;
-            validationError.errors.password = {message:'password is required!'};
-        }
-        
-        if(!isValid) res.status(400).json(util.successFalse(validationError));
-
-        resolve(isValid);
-    });
-}
-
-
-util.registerValidation = function (req, res) {
-    return new Promise(function(resolve, reject){
-        var isValid = true;
-        var validationError = {
-            name:'ValidationError',
-            errors:{}
-        };
-
-        if(!req.body.user_id){
-            isValid = false;
-            validationError.errors.userid = { message:'user_id is required!'};
-        }
-        if(!req.body.password){
-            isValid = false;
-            validationError.errors.password = {message:'password is required!'};
-        }
-        if(!req.body.name){
-            isValid = false;
-            validationError.errors.name = {message:'name is required!'};
-        }
-        if(!req.body.nickname){
-            isValid = false;
-            validationError.errors.nickname = {message:'nickname is required!'};
-        }
-        if(!req.body.phonenum){
-            isValid = false;
-            validationError.errors.password = {message:'phonenum is required!'};
-        }
-        
-        if(!isValid) res.status(400).json(util.successFalse(validationError));
-
-        resolve(isValid);
-    });
-}
 
 util.generateAccessToken = function(req, res){
     return new Promise((resolve, reject) => {
@@ -115,8 +41,7 @@ util.generateAccessToken = function(req, res){
     });
 }
 
-
-util.generateRefreshToken = function(req, res){
+util.generateRefreshToken = function(req, res) {
     return new Promise((resolve, reject) => {
         jwt.sign({
             user_id: req.body.user_id,
@@ -132,8 +57,6 @@ util.generateRefreshToken = function(req, res){
     });
 }
 
-
-
 util.isLoggedin = function (req, res, next) {
     var token = req.headers['x-access-token'] || req.query.token;
     //token 변수에 토큰이 없다면
@@ -145,6 +68,7 @@ util.isLoggedin = function (req, res, next) {
             else {
                 console.dir(decoded);
                 req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
+                req.body = decoded;
                 next();
             }
         });
@@ -163,6 +87,7 @@ util.isAdmin = function (req, res, next) {
                 if(decoded.admin) {
                     console.dir(decoded);
                     req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
+                    req.body = decoded;
                     next();
                 }
                 else {
@@ -172,7 +97,6 @@ util.isAdmin = function (req, res, next) {
         });
     }
 };
-
 
 //토큰에 들어있는 ID와 DB에서 찾은 ID와 비교
 util.checkPermission = (req, res, next) => {
