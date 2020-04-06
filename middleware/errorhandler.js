@@ -6,16 +6,15 @@ exports.parseError = function (err) {
     var parsed = [
         {
             msg: err.message,
-            data: err.stack,
         }
     ];
     if (err.name == 'ValidationError') {
-        return err.errors;
+        return err;
     }
     if (err.name == 'TypeError'){
         return parsed;
     }
-     else {
+    else {
         parsed.unhandled = err;
     }
     return parsed;

@@ -5,6 +5,8 @@ exports.result = (req, res, next) => {
     const err = validationResult(req);
     if (!err.isEmpty()) {
         res.status(422);
+        console.dir(err);
+        err.errors.name = err.name
         res.json(util.successFalse({ 
             name: 'ValidationError',
             errors : err.errors //에러가 ID에서만 나면 [0], password까지 나면 [1]까지 배열 출력
@@ -42,15 +44,15 @@ exports.password = [
         .withMessage('비밀번호는 6자리 이상입니다.') // 비밀번호를 공백으로 내면 이 메시지는 무시
 ]
 
-exports.name = [
+exports.name = [ // 한글만 가능하게 추후 구현 필요
     check('name')
         .trim()
         .not()
         .isEmpty()
         .withMessage('이름을 입력해주세요.')
         .bail()
-        .isAlpha()
-        .withMessage('유효하지 않은 문자 형식입니다.')
+        .isAlpha(['ko-KR'])
+        .withMessage('이름은 한글로 입력해주세요.')
         .bail()
         .isLength({ min: 2 })
         .withMessage('이름은 2자리 이상입니다.')
@@ -62,9 +64,6 @@ exports.nickname = [
         .not()
         .isEmpty()
         .withMessage('닉네임을 입력해주세요.')
-        .bail()
-        .isAlphanumeric()
-        .withMessage('유효하지 않은 문자 형식입니다.')
         .bail()
         .isLength({ min: 2 })
         .withMessage('닉네임은 2자리 이상입니다.')

@@ -19,11 +19,43 @@ util.successFalse = function (err, comment) {
     return {
         success: false,
         timestamp: new Date(Date.now()),
-        name: (err) ? err.name : null,
-        errors: (err) ? errorhandler.parseError(err) : null,
+        data: (err) ? util.parseError(err) : null,
         comment: comment
     };
 };
+
+util.parseError = function (err) {
+    var parsed = {
+        name: err.name,
+        error: err.stack
+    };
+    if (err.name == 'ValidationError') {
+        return err;
+    }
+    if (err.name == 'TypeError'){
+        return parsed;
+    }
+    else {
+        parsed.unhandled = err;
+    }
+    return parsed;
+};
+
+
+exports.result = (req, res, next) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+        res.status(422);
+        console.dir(err);
+        err.errors.name = err.name
+        res.json(util.successFalse({ 
+            name: 'ValidationError',
+            errors : err.errors //에러가 ID에서만 나면 [0], password까지 나면 [1]까지 배열 출력
+            })
+        );
+    }
+    else next();
+}
 
 util.generateAccessToken = function(req, res){
     return new Promise((resolve, reject) => {

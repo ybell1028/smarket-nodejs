@@ -39,11 +39,6 @@ module.exports = {
         defaultValue: false,
         allowNull: false
       },
-      refresh_token: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        defaultValue: null
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false
