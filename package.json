@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-error-handler": "^1.1.0",
     "express-session": "^1.17.0",
+    "express-validator": "^6.4.0",
     "firebase-admin": "^8.10.0",
     "googleapis": "^48.0.0",
     "http": "^0.0.0",
@@ -31,7 +32,8 @@
     "path": "^0.12.7",
     "request": "^2.88.2",
     "sequelize": "^5.21.5",
-    "serve-static": "^1.14.1"
+    "serve-static": "^1.14.1",
+    "validator": "^13.0.0"
   },
   "devDependencies": {},
   "scripts": {
