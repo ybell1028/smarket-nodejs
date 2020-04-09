@@ -17,7 +17,7 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
         }
     }
     request.get(options , function(err, response, body) { // res, response 중복 주의
-        if(!err && response.statusCode == 200){
+        if(!err && response.statusCode === 200){
             console.dir(req.query);
             console.log('검색 성공');
             console.log('statusCode : ' + response.statusCode);

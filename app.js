@@ -27,7 +27,9 @@ const models = require("./models/index.js");
 
 app.use(function(req, res, next) {
     res.status(404);
-    res.json(util.successFalse(null, '404 Not Found'));
+    res.json(util.successFalse({
+        name:'404 Not Found'
+    }, '404 Not Found'));
 });
 
 models.sequelize.sync().then(() => {

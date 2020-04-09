@@ -36,10 +36,10 @@ exports.bookmarkList = (req, res) => {
             .findAll({
                 where: {
                     user_id: req.body.user_id,
-                    foldername: queryFoldername
+                    folder_name: queryFoldername
                 }
             })
-            .then(function (data) {
+            .then(function (data) {//null값 나오면 어떻게해야해!
                 console.dir(data);
                 console.log('북마크 폴더 ' + queryFoldername + ' 조회 완료.');
                 res.status(200);

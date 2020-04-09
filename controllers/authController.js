@@ -1,6 +1,5 @@
 var models = require("../models");
 var util = require('../middleware/util');
-var errorhandler = require("../middleware/errorhandler");
 var jwt = require('jsonwebtoken');
 var jwtConfig = require("../config/jwt");
 var crypto = require('crypto');
@@ -118,7 +117,7 @@ exports.checkId = (req, res) => { // 만약 아이디를 쓰지 않는다면?
             where: { user_id: req.body.user_id }
         })
         .then((data) => { //ID 중복 검사
-            if (!(data == null || data == undefined)){
+            if (!(data === null || data === undefined)){
                 res.status(409);
                 res.json(util.successFalse(null, '이미 존재하는 ID 입니다.'));
             }
@@ -141,7 +140,7 @@ exports.checkNickname = (req, res) => {
             where: { nickname: req.body.nickname }
         })
         .then((data) => { //ID 중복 검사
-            if (!(data == null || data == undefined)){
+            if (!(data === null || data === undefined)){
                 res.status(409);
                 res.json(util.successFalse(null, '이미 존재하는 닉네임입니다.'));
             }
