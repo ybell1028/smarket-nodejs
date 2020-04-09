@@ -1,5 +1,4 @@
 var express = require('express');
-var errorhandler = require("../middleware/errorhandler");
 var validation = require("../middleware/validation");
 const authController = require('../controllers/authController');
 var router = express.Router();
