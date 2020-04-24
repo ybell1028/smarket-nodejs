@@ -17,16 +17,17 @@ exports.result = (req, res, next) => {
 }
 
 exports.user_id = [
-    check('user_id')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage('ID를 입력해주세요.')
-        .bail()
-        .isAlphanumeric()
+    check('user_id') // req.body, req.cookies, req.headers
+    // req.params, req.query에 user_id라는 속성이 있는지 검사
+        .trim() // 해당 값에 공백이 있으면 없애고 붙힘
+        .not() // 만약
+        .isEmpty() // 빈값(""빈스트링, null, undefined)이라면
+        .withMessage('ID를 입력해주세요.')//패러미터에 들어있는 스트링을 msg에 담아 응답
+        .bail()//위의 조건에 해당하면 아래에 있는 유효성 검사는 하지 않음
+        .isAlphanumeric() // 영문 || 숫자 || 영문 + 숫자인가?
         .withMessage('영문 또는 숫자를 입력해주세요.')
         .bail()
-        .isLength({ min: 6 })
+        .isLength({ min: 6 }) // String의 길이가 6 이상인가?
         .withMessage('ID는 6자리 이상입니다.')
 ]
 

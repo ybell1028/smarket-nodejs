@@ -1,26 +1,29 @@
 {
   "development": {
     "username": "root",
-    "password": "1028",
+    "password": "",
     "database": "android",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": 0
+    "operatorsAliases": 0,
+    "logging": false
   },
   "test": {
     "username": "root",
-    "password": "1028",
+    "password": "",
     "database": "android_test",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": 0
+    "operatorsAliases": 0,
+    "logging": false
   },
   "production": {
     "username": "root",
-    "password": "1028",
+    "password": "",
     "database": "android_production",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": 0
+    "operatorsAliases": 0,
+    "logging": false
   }
 }
