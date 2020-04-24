@@ -5,6 +5,7 @@ var bookmarkRouter = require("./bookmarks");
 var pushRouter = require("./push")
 var naverRouter = require("./naver");
 var youtubeRouter = require("./youtube");
+var crawlingRouter = require("./crawling");
 
 var app = express();
 
@@ -14,5 +15,6 @@ app.use("/bookmarks", bookmarkRouter);
 app.use("/push", pushRouter);
 app.use("/naver", naverRouter);
 app.use("/youtube", youtubeRouter);
+app.use("/crawling", crawlingRouter);
 
 module.exports = app;

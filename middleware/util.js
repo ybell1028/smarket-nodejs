@@ -1,6 +1,5 @@
 var jwt = require('jsonwebtoken');
 var models = require("../models");
-var errorhandler = require("../middleware/errorhandler");
 var jwtConfig = require("../config/jwt");
 
 var util = {};
@@ -20,25 +19,21 @@ util.successFalse = function (err, comment) {
         success: false,
         timestamp: new Date(Date.now()),
         data: (err) ? util.parseError(err) : null,
-        comment: comment
+        comment: (comment) ? comment : null
     };
 };
 
 util.parseError = function (err) {
     var parsed = {
         name: err.name,
-        error: err.stack
+        msg: err.message
     };
     if (err.name == 'ValidationError') {
         return err;
     }
-    if (err.name == 'TypeError'){
+    else {
         return parsed;
     }
-    else {
-        parsed.unhandled = err;
-    }
-    return parsed;
 };
 
 
@@ -99,8 +94,8 @@ util.isLoggedin = function (req, res, next) {
             if (err) return res.status(401).json(util.successFalse(err));
             else {
                 console.dir(decoded);
-                req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
-                req.body = decoded;
+                console.log('인증됨.')
+                req.body.user_id = decoded.user_id;
                 next();
             }
         });
@@ -118,8 +113,7 @@ util.isAdmin = function (req, res, next) {
             else {
                 if(decoded.admin) {
                     console.dir(decoded);
-                    req.decoded = decoded; // req.decoded에 decode된 토큰을 저장
-                    req.body = decoded;
+                    req.body.user_id = decoded.user_id;
                     next();
                 }
                 else {

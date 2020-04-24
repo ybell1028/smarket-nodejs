@@ -4,10 +4,7 @@ var util = require('../middleware/util');
 var validation = require("../middleware/validation");
 var router = express.Router();
 
-//1. post로 요청할 URL) http://localhost:3000/api/bookmark
-//2. 헤더에 토큰 넣어줘야함(util.isLoggedin)
-//3. body에 입력해야하는 JSON 포맷
-//1)listname 2)bookmarkname 3)url
+// POST api/bookmarks - 북마크 등록
 router.post('/', 
     util.isLoggedin,
     validation.user_id,
@@ -16,19 +13,23 @@ router.post('/',
     validation.url,
     validation.result,
     bookmarkController.bookmarkCreate);
-    
+
+
+// GET api/bookmarks - 북마크 전체 조회   
 router.get('/', 
     util.isLoggedin,
     validation.user_id,
     validation.result,
     bookmarkController.bookmarkList);
 
+// GET api/bookmarks/bookmarkid - 해당 id의 북마크 조회   
 router.get('/:bookmarkid', 
     util.isLoggedin,
     validation.user_id,
     validation.result,
     bookmarkController.bookmarkDetail);
 
+// PUT api/bookmarks - 북마크 폴더 이름 변경   
 router.put('/', 
     util.isLoggedin,
     validation.before,
@@ -36,6 +37,7 @@ router.put('/',
     validation.result,
     bookmarkController.bookmarkFolderModify);
 
+// PUT api/bookmarks/bookmarkid - 해당 id의 북마크 정보 변경(이름, 내용)   
 router.put('/:bookmarkid', 
     util.isLoggedin,
     validation.user_id,
@@ -45,12 +47,15 @@ router.put('/:bookmarkid',
     validation.result,
     bookmarkController.bookmarkModify);
 
+// DELETE api/bookmarks - 북마크 폴더 삭제   
 router.delete('/', 
     util.isLoggedin,
     validation.user_id,
     validation.result,
     bookmarkController.bookmarkFolderDelete);
-    
+
+
+// DELETE api/bookmarks/bookmarkid - 해당 id의 북마크 삭제
 router.delete('/:bookmarkid', 
     util.isLoggedin,
     validation.user_id,

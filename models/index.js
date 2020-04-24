@@ -13,13 +13,13 @@ var sequelize = new Sequelize(
   'root', // 유저네임
   '1028', // 유저 패스워드
   {
-  host: 'localhost',      // 호스트
-  dialect: 'mysql',    // DB종류
-  pool: {                 // connection pool
-          max: 10,
-          min: 0,
-          idle: 10000
-        },
+    host: 'localhost',      // 호스트
+    dialect: 'mysql',    // DB종류
+    pool: {                 // connection pool
+      max: 10,
+      min: 0,
+      idle: 10000
+    }
   }
 );
 if (config.use_env_variable) {

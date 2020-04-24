@@ -1,6 +1,5 @@
 var models = require("../models");
 var util = require('../middleware/util');
-var errorhandler = require("../middleware/errorhandler");
 var crypto = require('crypto');
 
 exports.userList = (req, res) => {
@@ -9,7 +8,7 @@ exports.userList = (req, res) => {
         .findAll({
             attributes: ['user_id', 'name', 'nickname', 'phonenum']
         }).then((data) => { //ID 중복 검사
-            if (data == null || data == undefined) {
+            if (data === null || data === undefined) {
                 res.status(409);
                 res.json(util.successFalse(null, 'DB에 레코드가 없음.'));
             }
@@ -80,7 +79,7 @@ exports.userPasswordConfirm = (req, res) => {
         });
 };
 
-exports.userDetail = (req, res) => {
+exports.userDetail = (req, res) => { 
     console.log('사용자 정보 조회 호출됨.');
     models.user
         .findOne({
