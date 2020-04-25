@@ -34,8 +34,6 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "puppeteer": "^3.0.1",
-    "puppeteer-cluster": "^0.20.0",
     "request": "^2.88.2",
     "selenium-webdriver": "^4.0.0-alpha.7",
     "sequelize": "^5.21.5",
