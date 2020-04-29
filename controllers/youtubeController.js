@@ -21,14 +21,14 @@ exports.search = (req, res) => {
 
 	request.get(youtubeUrl, function(err, response, body){
 		if(!err && response.statusCode == 200){
-            console.log('검색 성공');
+            console.log('유튜브 API 검색 성공');
             let data = JSON.parse(body)
             res.status(response.statusCode);
             res.json(util.successTrue(data));
         }
         else {
             console.dir(err);
-            console.log('검색 실패');
+            console.log('유튜브 API 검색 실패');
             res.status(response.statusCode);
             res.json(util.successFalse(err, '유튜브 API 검색 실패'));
         }

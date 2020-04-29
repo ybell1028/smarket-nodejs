@@ -5,17 +5,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
     },
-    folder_name: { // 북마크 리스트 이름
+    folder_name: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false
+    },
+    item_title:{
         type: DataTypes.STRING,
         allowNull: false
     },
-    bookmark_name:{ // 하나의 북마크 이름 
+    item_id:{
         type: DataTypes.STRING,
+        unique: true,
         allowNull: false
     },
-    url:{
-        type: DataTypes.STRING,
-        allowNull: false
+    item_type:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     }
   }, {
     underscored: true,

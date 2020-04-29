@@ -43,31 +43,31 @@ models.sequelize.sync().then(() => {
 // 멀티 스레드
 /* cluster(multithread) setting */
 
-if (cluster.isMaster) {
+// if (cluster.isMaster) {
     
-    for (let i = 1; i <= numCPUs; i++) {
-        console.log('worker process create[' + i + ']');
-        cluster.fork();
-    }
+//     for (let i = 1; i <= numCPUs; i++) {
+//         console.log('worker process create[' + i + ']');
+//         cluster.fork();
+//     }
 
-    cluster.on('listening', function(worker, address) {
-        console.log("Worker " + worker.id + " is now connected to " + address.address + ":" + address.port);
-    });
+//     cluster.on('listening', function(worker, address) {
+//         console.log("Worker " + worker.id + " is now connected to " + address.address + ":" + address.port);
+//     });
  
-    cluster.on('exit',function(worker, code, signal){
-        console.log(`worker ${worker.process.pid} died`);
-        cluster.fork();
-    });
+//     cluster.on('exit',function(worker, code, signal){
+//         console.log(`worker ${worker.process.pid} died`);
+//         cluster.fork();
+//     });
  
-} else {
-    http.createServer(app).listen(app.get('port'), function () {
-        console.log('slave server '+cluster.worker.process.pid);
-    });
-}
+// } else {
+//     http.createServer(app).listen(app.get('port'), function () {
+//         console.log('slave server '+cluster.worker.process.pid);
+//     });
+// }
 
 
 // 싱글 스레드
-// http.createServer(app).listen(app.get('port'), function () {
-//     console.log('server is running');
-// });
+http.createServer(app).listen(app.get('port'), function () {
+    console.log('server is running');
+});
 

@@ -13,15 +13,20 @@ module.exports = {
                 allowNull: false
             },
             folder_name: {
-                type: Sequelize.STRING(20),
+                type: Sequelize.STRING(150),
                 allowNull: false
             },
-            bookmark_name: {
+            item_id: {
+                type: Sequelize.STRING,
+                unique: true,
+                allowNull: false
+            },
+            item_title: {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            url: {
-                type: Sequelize.STRING,
+            item_type: {
+                type: Sequelize.BOOLEAN,
                 allowNull: false
             }
         });

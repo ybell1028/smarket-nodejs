@@ -17,14 +17,14 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
     }
     request.get(options , function(err, response, body) { // res, response 중복 주의
         if(!err && response.statusCode === 200){
-            console.log('검색 성공');
+            console.log('네이버 API 검색 성공');
             let data = JSON.parse(body)
             res.status(response.statusCode);
             res.json(util.successTrue(data));
         }
         else {
             console.dir(err);
-            console.log('검색 실패');
+            console.log('네이버 API 검색 실패');
             res.status(response.statusCode);
             res.json(util.successFalse(err, '네이버 API 검색 실패'));
         }
