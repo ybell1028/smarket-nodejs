@@ -54,7 +54,7 @@ exports.userRegister = async (req, res) => {
 exports.userPasswordConfirm = (req, res) => {
     console.log('사용자 비밀번호 인증 호출됨.');
     models.user
-        .findOne({
+        .findAll({
             where: {user_id : req.body.user_id}
         }).then((data) => {
             let dbPassword = data.dataValues.password;
@@ -83,6 +83,7 @@ exports.userDetail = (req, res) => {
     console.log('사용자 정보 조회 호출됨.');
     models.user
         .findOne({
+            attributes: ['user_id', 'name', 'nickname', 'phonenum'],
             where: {user_id : req.params.userid}
         }).then((data) => {
             res.status(200);

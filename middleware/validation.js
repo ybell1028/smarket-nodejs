@@ -106,7 +106,7 @@ exports.url = [
         .withMessage('유효하지 않은 URL 형식입니다.')
 ]
 
-exports.before = [
+exports.before_name = [
     check('before_name')
         .not()
         .isEmpty()
@@ -114,7 +114,7 @@ exports.before = [
         .bail()
 ]
 
-exports.after = [
+exports.after_name = [
     check('after_name')
         .not()
         .isEmpty()

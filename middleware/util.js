@@ -130,7 +130,8 @@ util.checkPermission = (req, res, next) => {
         .findOne({
             where: { user_id: req.params.userid }
         }).then((data) => {
-            if (data.dataValues.user_id === req.decoded.user_id)
+            console.dir(req.decoded);
+            if (data.dataValues.user_id === req.body.user_id)
                 next();
 
             else res.status(401).json(util.successFalse(null, "you don't have permission"));

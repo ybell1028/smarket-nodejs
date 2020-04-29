@@ -8,8 +8,9 @@ exports.bookmarkCreate = (req, res) => {
         .create({
             user_id: req.body.user_id,
             folder_name: req.body.folder_name,
-            bookmark_name: req.body.bookmark_name,
-            url: req.body.url
+            item_id: req.body.item_id,
+            item_title: req.body.item_title,
+            item_type: req.body.item_type
         })
         .then(data => {
             console.dir(data);
@@ -19,6 +20,7 @@ exports.bookmarkCreate = (req, res) => {
         })
         .catch(err => {
             console.dir(err);
+            console.log('북마크 에러.');
             res.status(500);
             res.json(util.successFalse(err, '북마크 생성 에러.'));
         });
@@ -47,6 +49,7 @@ exports.bookmarkList = (req, res) => {
             })
             .catch(err => {
                 console.dir(err);
+                console.log('북마크 폴더 조회 에러')
                 res.status(500);
                 res.json(util.successFalse(err, '북마크 폴더 ' + queryFoldername + ' 조회 에러'));
             });
@@ -66,6 +69,7 @@ exports.bookmarkList = (req, res) => {
         })
         .catch(err => {
             console.dir(err);
+            console.log(req.body.user_id +  '의 모든 북마크 리스트 조회 에러.');
             res.status(500);
             res.json(util.successFalse(err, req.body.user_id +  '의 모든 북마크 리스트 조회 에러.'));
         });
@@ -97,6 +101,7 @@ exports.bookmarkDetail = (req, res) => {
         })
         .catch(err => {
             console.dir(err);
+            console.log('북마크 조회 에러');
             res.status(500);
             res.json(util.successFalse(err, '북마크 조회 에러'));
         });
@@ -130,10 +135,10 @@ exports.bookmarkModify = (req, res) => {
     console.log('개별 북마크 수정 호출됨.');
     models.bookmark // 처음 만드는 기본 북마크는 클라이언트에서 설정해줘야함
         .update({
-            user_id: req.body.user_id,
             folder_name: req.body.folder_name,
-            bookmark_name: req.body.bookmark_name,
-            url: req.body.url
+            item_id: req.body.item_id,
+            item_title: req.body.item_title,
+            item_type: req.body.item_type
         },{
             where: {id: req.params.bookmarkid} // userid와 혼동하지 말것}
         })

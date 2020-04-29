@@ -17,11 +17,9 @@ router.post('/',
     validation.result,
     usersController.userRegister);
 
-
 // POST api/users/passwordconfirm - 개인정보 수정시 비밀번호 확인
 router.post('/passwordconfirm', 
     util.isLoggedin,
-    validation.user_id,
     validation.password,
     validation.result,
     usersController.userPasswordConfirm);
@@ -29,7 +27,6 @@ router.post('/passwordconfirm',
 // GET api/users - 유저 전체 정보 조회, 다만 관리자 계정만 가능   
 router.get('/', 
     util.isAdmin,
-    validation.user_id,
     validation.result,
     usersController.userList);
 
@@ -44,7 +41,6 @@ router.get('/:userid',
 router.put('/:userid', 
     util.isLoggedin, 
     util.checkPermission,
-    validation.user_id,
     validation.password,
     validation.name,
     validation.nickname,
