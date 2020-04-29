@@ -88,22 +88,38 @@ exports.folder_name = [
         .withMessage('폴더명을 입력해주세요.')
 ]
 
-exports.bookmark_name = [
-    check('bookmark_name')
+exports.item_title = [
+    check('item_title')
         .not()
         .isEmpty()
-        .withMessage('북마크명을 입력해주세요.')
+        .withMessage('아이템 타이틀이 필요합니다.')
 ]
 
-exports.url = [
-    check('url')
-        .trim()
+exports.item_id = [
+    check('item_id')
         .not()
         .isEmpty()
-        .withMessage('URL을 입력해주세요.')
+        .withMessage('아이템 ID가 필요합니다.')
+]
+
+exports.item_type = [
+    check('item_type')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 타입이 필요합니다.')
         .bail()
-        .isURL()
-        .withMessage('유효하지 않은 URL 형식입니다.')
+        .isInt()
+        .withMessage('아이템 타입은 Integer입니다.')
+]
+
+exports.item_selling = [
+    check('item_selling')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 판매여부가 필요합니다.')
+        .bail()
+        .isBoolean()
+        .withMessage('아이템 판매여부는 Boolean입니다.')
 ]
 
 exports.before_name = [
@@ -111,7 +127,6 @@ exports.before_name = [
         .not()
         .isEmpty()
         .withMessage('변경 전 이름을 입력해주세요.')
-        .bail()
 ]
 
 exports.after_name = [
@@ -119,5 +134,11 @@ exports.after_name = [
         .not()
         .isEmpty()
         .withMessage('변경 후 이름을 입력해주세요.')
-        .bail()
+]
+
+exports.new_name = [
+    check('new_name')
+        .not()
+        .isEmpty()
+        .withMessage('변경 할 이름을 입력해주세요.')
 ]

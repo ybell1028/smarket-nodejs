@@ -17,19 +17,19 @@ exports.userList = (req, res) => {
                 res.json(util.successTrue(data));
             }
         }).catch((err) => {
-            console.log('DB에서 사용자 리스트 조회 실패');
+            console.log('사용자 리스트 조회 실패.');
             res.status(500);
-            res.json(util.successTrue(err, 'DB에서 사용자 리스트 조회 실패'));
+            res.json(util.successTrue(err, '사용자 리스트 조회 실패.'));
         });
 }
 
-exports.userRegister = async (req, res) => {
+exports.userRegister = (req, res) => {
     let inputPassword = req.body.password;
     let salt = Math.round((new Date().valueOf() * Math.random())) + "";
     let hashPassword = crypto.createHash("sha512").update(inputPassword + salt).digest("hex");
     models.user
         .create({
-            user_id: req.body.user_id,
+            user_id: req.body.user_id, //처음 가입할때는 넣어줘야함
             password: hashPassword,
             name: req.body.name,
             nickname: req.body.nickname,
@@ -45,16 +45,16 @@ exports.userRegister = async (req, res) => {
         })
         .catch(err => {
             console.dir(err);
-            console.log('계정 데이터 삽입중 에러.');
+            console.log('계정 데이터 삽입 실패.');
             res.status(500)
-            res.json(util.successFalse(err));
+            res.json(util.successFalse(err, '계정 데이터 삽입 실패.'));
         });
 };
 
-exports.userPasswordConfirm = (req, res) => {
+exports.userPasswordConfirm = async (req, res) => {
     console.log('사용자 비밀번호 인증 호출됨.');
     models.user
-        .findAll({
+        .findOne({
             where: {user_id : req.body.user_id}
         }).then((data) => {
             let dbPassword = data.dataValues.password;
@@ -73,9 +73,9 @@ exports.userPasswordConfirm = (req, res) => {
                 res.json(util.successFalse(null, '비밀번호가 틀립니다.'));
             }
         }).catch((err) => {
-            console.log('DB에서 사용자 정보 조회 실패');
+            console.log('사용자 비밀번호 인증 실패.');
             console.dir(err);
-            res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 조회 실패'));
+            res.status(500).json(util.successFalse(err, '사용자 비밀번호 인증 실패.'));
         });
 };
 
@@ -89,9 +89,9 @@ exports.userDetail = (req, res) => {
             res.status(200);
             res.json(util.successTrue(data));
         }).catch((err) => {
-            console.log('DB에서 사용자 정보 조회 실패');
+            console.log('사용자 정보 조회 실패.');
             console.dir(err);
-            res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 조회 실패'));
+            res.status(500).json(util.successFalse(err, '사용자 정보 조회 실패.'));
         });
 };
 
@@ -107,19 +107,22 @@ exports.userModify = (req, res) => {
 
     models.user
         .update({
-            user_id : req.body.user_id, // 얘는 절대 바뀌면 안됨
-            salt : newSalt,
+            user_id : req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
+            // PUT은 전체가 아닌 일부만 전달할 경우, 전달한 필드외 모두 null이 되버려서 넣어야함
             password : crypto.createHash("sha512").update(req.body.password + newSalt).digest("hex"),
-            name : req.body.name
+            name : req.body.name,
+            salt : newSalt,
+            nickname: req.body.nickname,
+            phonenum: req.body.phonenum
         },{
-            where: {user_id : req.body.user_id}
+            where: {user_id : req.params.userid}
         }).then((data) => {
             res.status(200);
-            res.json(util.successTrue(data));
+            res.json(util.successTrue());
         }).catch((err) => {
-            console.log('DB에서 사용자 정보 수정 실패');
+            console.log('사용자 정보 수정 실패.');
             console.dir(err);
-            res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 수정 실패'));
+            res.status(500).json(util.successFalse(err, '사용자 정보 수정 실패.'));
         });
 };
 
@@ -127,14 +130,14 @@ exports.userModify = (req, res) => {
 exports.userWithdraw = (req, res) => {
     console.log('사용자 탈퇴 호출됨.');
     models.user
-        .findOneAndRemove({
+        .destroy({
             where: {user_id : req.params.userid}
         }).then((data) => {
             res.status(200);
-            res.json(util.successTrue(data));
+            res.json(util.successTrue());
         }).catch((err) => {
-            console.log('DB에서 사용자 정보 삭제 실패');
+            console.log('DB에서 사용자 정보 삭제 실패.');
             console.dir(err);
-            res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 삭제 실패'));
+            res.status(500).json(util.successFalse(err, 'DB에서 사용자 정보 삭제 실패.'));
         });
 };

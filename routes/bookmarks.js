@@ -8,30 +8,29 @@ var router = express.Router();
 router.post('/', 
     util.isLoggedin,
     validation.folder_name,
-    validation.bookmark_name,
-    validation.url,
+    validation.item_id,
+    validation.item_title,
+    validation.item_type,
     validation.result,
     bookmarkController.bookmarkCreate);
 
-
-// GET api/bookmarks - 북마크 전체 조회   
+// GET api/bookmarks - 자신의 모든 폴더안에 있는 북마크  조회
+// GET api/bookmarks?foldername=폴더이름 - 해당 폴더의 북마크 전체 조회      
 router.get('/', 
     util.isLoggedin,
     validation.result,
     bookmarkController.bookmarkList);
 
 // GET api/bookmarks/bookmarkid - 해당 id의 북마크 조회
-// api/bookmarks/bookmarkid?foldername=폴더이름 - 해당 폴더에 있는 북마크 조회   
 router.get('/:bookmarkid', 
     util.isLoggedin,
     validation.result,
     bookmarkController.bookmarkDetail);
 
-// PUT api/bookmarks - 북마크 폴더 이름 변경   
-router.put('/', 
+// PATCH api/bookmarks?foldername=폴더이름 - 북마크 폴더 이름 변경   
+router.patch('/', 
     util.isLoggedin,
-    validation.before_name,
-    validation.after_name,
+    validation.new_name, //새 이름
     validation.result,
     bookmarkController.bookmarkFolderModify);
 
@@ -39,12 +38,12 @@ router.put('/',
 router.put('/:bookmarkid', 
     util.isLoggedin,
     validation.folder_name,
-    validation.bookmark_name,
-    validation.url,
-    validation.result,
+    validation.item_id,
+    validation.item_title,
+    validation.item_type,
     bookmarkController.bookmarkModify);
 
-// DELETE api/bookmarks - 북마크 폴더 삭제   
+// DELETE api/bookmarks?foldername=폴더이름 - 북마크 폴더 삭제   
 router.delete('/', 
     util.isLoggedin,
     validation.result,

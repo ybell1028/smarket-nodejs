@@ -48,8 +48,8 @@ router.put('/:userid',
     validation.result,
     usersController.userModify);
 
-// DELETE api/users - 해당 유저 탈퇴, 호출 전에 먼저 passwordconfirm 해야함.    
-router.delete('/', 
+// DELETE api/users/userid - 해당 유저 탈퇴, 호출 전에 먼저 passwordconfirm 해야함.    
+router.delete('/:userid', 
     util.isLoggedin, 
     util.checkPermission,
     validation.result,
