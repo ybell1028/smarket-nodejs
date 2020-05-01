@@ -1,6 +1,7 @@
-var querystring = require('querystring');
-var util = require('../middleware/util');
-var models = require("../models");
+const querystring = require('querystring');
+const util = require('../middleware/util');
+const naverController = require('./naverController.js');
+const models = require("../models");
 
 exports.bookmarkCreate = (req, res) => {
     console.log('북마크 생성 호출됨.');
@@ -27,60 +28,71 @@ exports.bookmarkCreate = (req, res) => {
 };
 
 exports.bookmarkList = (req, res) => {
+    var queryFoldername = querystring.unescape(req.query.foldername); // 폴더 이름
 
-    var queryFoldername = querystring.unescape(req.query.foldername);
-
-    if (!(queryFoldername === 'null' || queryFoldername === 'undefined')) {
-        console.log(queryFoldername + ' 폴더 내 북마크 조회 호출됨.');
+    if (!(queryFoldername === 'null' || queryFoldername === 'undefined')) { // 폴더 이름이 빈 값이 아니라면
+        console.log('폴더 ' + queryFoldername + ' 내 북마크 조회 호출됨.');
         models.bookmark
             .findAll({
-                attributes: ['folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
+                attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
                 where: {
                     user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
                     folder_name: queryFoldername
                 }
             })
-            .then(function (data) {//null값 나오면 어떻게해야해!
-                console.dir(data);
-                res.status(200);
-                res.json(util.successTrue(data));
+            .then(list => naverController.checkSelling(list))
+            /* list에 폴더 내 북마크 리스트가 들어있음
+            checkSelling으로 아이템이 현재 판매중인지 검사*/
+            .then(checkedList => {
+                Promise.all(checkedList)
+                    .then(allCheckedList => {
+                        console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.');
+                        console.log(allCheckedList);
+                        res.status(200);
+                        res.json(util.successTrue(allCheckedList));
+                    })
             })
             .catch(err => {
                 console.dir(err);
-                console.log('북마크 폴더 조회 실패.')
+                console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.')
                 res.status(500);
-                res.json(util.successFalse(err, '북마크 폴더 ' + queryFoldername + ' 조회 실패.'));
+                res.json(util.successFalse(err, '폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.'));
             });
     }
     else {
-        console.log('모든 폴더 내 북마크 조회 호출됨.');
         models.bookmark
-        .findAll({ //사용자의 모든 북마크 리스트 조회
-            attributes: ['folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
-            where: {
-                user_id: req.body.user_id
-            }
-        })
-        .then(function (data) {
-            console.dir(data);
-            res.status(200);
-            res.json(util.successTrue(data));
-        })
-        .catch(err => {
-            console.dir(err);
-            console.log(req.body.user_id +  '의 모든 북마크 리스트 조회 실패.');
-            res.status(500);
-            res.json(util.successFalse(err, req.body.user_id +  '의 모든 북마크 리스트 조회 실패.'));
-        });
-    }
-
+            .findAll({ //사용자의 모든 북마크 리스트 조회
+                attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
+                where: {
+                    user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
+                }
+            })
+            .then(list => naverController.checkSelling(list))
+            /* list에 폴더 내 북마크 리스트가 들어있음
+            checkSelling으로 아이템이 현재 판매중인지 검사*/
+            .then(checkedList => {
+                Promise.all(checkedList)
+                    .then(allCheckedList => {
+                        console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.');
+                        console.log(allCheckedList);
+                        res.status(200);
+                        res.json(util.successTrue(allCheckedList));
+                    })
+            })
+            .catch(err => {
+                console.dir(err);
+                console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.')
+                res.status(500);
+                res.json(util.successFalse(err, '폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.'));
+            });
+        }
 };
 
 exports.bookmarkDetail = (req, res) => {
     console.log('북마크 정보 조회 호출됨.');
     models.bookmark
         .findOne({
-            attributes: ['folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
+            attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
             where: {
                 id: req.params.bookmarkid,
                 user_id: req.body.user_id
@@ -155,6 +167,37 @@ exports.bookmarkModify = (req, res) => {
             console.log('개별 북마크 수정 실패.');
             res.status(500);
             res.json(util.successFalse(err, '개별 북마크 수정 실패.'));
+        });
+};
+
+let isSelling = (item_id, item_title, item_selling) => {
+
+}
+
+exports.Selling = (req, res) => {
+    console.log('아이템 판매 여부 확인 호출.');
+
+    var queryFoldername = querystring.unescape(req.query.foldername);
+
+    models.bookmark // 처음 만드는 기본 북마크는 클라이언트에서 설정해줘야함
+        .update({
+            folder_name: req.body.new_name
+        },{
+            where: {
+                user_id: req.body.user_id, // userid와 혼동하지 말것
+                folder_name: queryFoldername
+            } 
+        })
+        .then(data => {
+            console.dir(data);
+            res.status(200);
+            res.json(util.successTrue(data));
+        })
+        .catch(err => {
+            console.dir(err);
+            console.log('북마크 폴더 수정 실패.');
+            res.status(500);
+            res.json(util.successFalse(err, '북마크 폴더 수정 실패.'));
         });
 };
 
