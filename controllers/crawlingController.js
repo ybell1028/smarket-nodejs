@@ -1,5 +1,4 @@
 /* puppeteer */
-
 const models = require("../models");
 const util = require('../middleware/util');
 const puppeteer = require('puppeteer');
@@ -15,6 +14,9 @@ let request = require("request");
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+/* itemDetail */
+const naverController = require('./naverController.js');
+const youtubeController = require('./youtubeController.js');
 
 exports.spec = (req, res) => {
   console.log('다나와 스펙 크롤링 호출됨.');
@@ -153,6 +155,27 @@ var ruriwebCrawl = (pageNum, callback) => {
     callback(null, data);
   })
 };
+
+
+exports.itemDetail = (req, res) => {
+  let promises = [];
+
+  promises.push(crawlSpec(req.query.query, page));
+  promises.push(youtubeController.searchToTitle(req));
+
+  Promise.all(promises)
+      .then(detailData => {
+          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
+          res.status(200);
+          res.json(util.successTrue(detailData));
+      })
+      .catch(err => {
+          console.dir(err);
+          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
+          res.status(500);
+          res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
+      });
+}
 
 // let productCode = async function(page){
 //   const productCode = await page.evaluate(() => {

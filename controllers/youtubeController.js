@@ -11,18 +11,16 @@ exports.search = (req, res) => {
 		part: "snippet",
 		key: YOUTUBE_API_KEY,
 		type: "video",
-		maxResults: req.query.maxResults,
+		// maxResults: req.query.maxResults,
 		regionCode: "KR"
 	};
 
 	var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
 
-	console.log(youtubeUrl);
-
 	request.get(youtubeUrl, function(err, response, body){
 		if(!err && response.statusCode == 200){
             console.log('유튜브 API 검색 성공');
-            let data = JSON.parse(body)
+            let data = JSON.parse(body);
             res.status(response.statusCode);
             res.json(util.successTrue(data));
         }
@@ -34,3 +32,30 @@ exports.search = (req, res) => {
         }
     });
 }
+
+
+exports.searchToTitle = (req) => new Promise((resolve, reject) => {
+    var options = {
+		q: req.query.query,
+		part: "snippet",
+		key: YOUTUBE_API_KEY,
+		type: "video",
+		// maxResults: req.query.maxResults,
+		regionCode: "KR"
+	};
+
+	var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
+
+	request.get(youtubeUrl, function(err, response, body){
+		if(!err && response.statusCode == 200){
+            console.log('유튜브 API 검색 성공');
+            let data = JSON.parse(body).items;
+            resolve(data);
+        }
+        else {
+            console.dir(err);
+            console.log('유튜브 API 검색 실패');
+            reject(err);
+        }
+    });
+});

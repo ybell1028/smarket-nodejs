@@ -22,10 +22,10 @@ router.get('/',
     bookmarkController.bookmarkList);
 
 // GET api/bookmarks/bookmarkid - 해당 id의 북마크 조회
-router.get('/:bookmarkid', 
-    util.isLoggedin,
-    validation.result,
-    bookmarkController.bookmarkDetail);
+// router.get('/:bookmarkid', 
+//     util.isLoggedin,
+//     validation.result,
+//     bookmarkController.bookmarkDetail);
 
 // PATCH api/bookmarks?foldername=폴더이름 - 북마크 폴더 이름 변경   
 router.patch('/', 
