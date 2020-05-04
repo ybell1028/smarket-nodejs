@@ -9,7 +9,7 @@ var router = express.Router();
 
 // POST api/users - 회원가입
 router.post('/',
-    validation.user_id,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.password,
     validation.name,
     validation.nickname,
@@ -20,6 +20,7 @@ router.post('/',
 // POST api/users/passwordconfirm - 개인정보 수정시 비밀번호 확인
 router.post('/passwordconfirm', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.password,
     validation.result,
     usersController.userPasswordConfirm);
@@ -27,6 +28,7 @@ router.post('/passwordconfirm',
 // GET api/users - 유저 전체 정보 조회, 다만 관리자 계정만 가능   
 router.get('/', 
     util.isAdmin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result,
     usersController.userList);
 
@@ -34,6 +36,7 @@ router.get('/',
 router.get('/:userid', 
     util.isLoggedin, 
     util.checkPermission,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result, 
     usersController.userDetail);
 
@@ -41,6 +44,7 @@ router.get('/:userid',
 router.put('/:userid', 
     util.isLoggedin, 
     util.checkPermission,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.password,
     validation.name,
     validation.nickname,
@@ -52,6 +56,7 @@ router.put('/:userid',
 router.delete('/:userid', 
     util.isLoggedin, 
     util.checkPermission,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result,
     usersController.userWithdraw);
 

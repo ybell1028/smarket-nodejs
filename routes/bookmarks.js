@@ -7,6 +7,7 @@ var router = express.Router();
 // POST api/bookmarks - 북마크 등록
 router.post('/', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.folder_name,
     validation.item_id,
     validation.item_title,
@@ -18,6 +19,7 @@ router.post('/',
 // GET api/bookmarks?foldername=폴더이름 - 해당 폴더의 북마크 전체 조회      
 router.get('/', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result,
     bookmarkController.bookmarkList);
 
@@ -30,6 +32,7 @@ router.get('/',
 // PATCH api/bookmarks?foldername=폴더이름 - 북마크 폴더 이름 변경   
 router.patch('/', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.new_name, //새 이름
     validation.result,
     bookmarkController.bookmarkFolderModify);
@@ -37,6 +40,7 @@ router.patch('/',
 // PUT api/bookmarks/bookmarkid - 해당 id의 북마크 정보 변경(이름, 내용)   
 router.put('/:bookmarkid', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.folder_name,
     validation.item_id,
     validation.item_title,
@@ -46,6 +50,7 @@ router.put('/:bookmarkid',
 // DELETE api/bookmarks?foldername=폴더이름 - 북마크 폴더 삭제   
 router.delete('/', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result,
     bookmarkController.bookmarkFolderDelete);
 
@@ -53,6 +58,7 @@ router.delete('/',
 // DELETE api/bookmarks/bookmarkid - 해당 id의 북마크 삭제
 router.delete('/:bookmarkid', 
     util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
     validation.result,
     bookmarkController.bookmarkDelete);
 
