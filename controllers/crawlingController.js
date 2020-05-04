@@ -106,7 +106,8 @@ let crawlSpec = async function (keyword, page) {
     // const productCodeList = await productCode(page);
     console.log('Took', Date.now() - start, 'ms');
     await delay(500);
-    return await specList(page);
+    data.spec = await specList(page);
+    return data;
   } catch (err) {
     throw err;
   } finally {
@@ -167,6 +168,8 @@ exports.itemDetail = (req, res) => {
       .then(detailData => {
           console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
           res.status(200);
+          console.log(detailData[0]); // spec
+          console.log(detailData[1][0]); // youtube data
           res.json(util.successTrue(detailData));
       })
       .catch(err => {

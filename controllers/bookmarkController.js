@@ -16,23 +16,24 @@ exports.bookmarkCreate = (req, res) => {
         })
         .then(data => {
             console.dir(data);
+            console.log('북마크 생성 성공.\n');
             res.status(201); // 201은 새로운 컨텐츠 만들기에 성공했을 때 사용. POST 메소드에 대한 응답으로 잘 어울림.
             res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
-            console.log('북마크 생성 실패.');
+            console.log('북마크 생성 실패.\n');
             res.status(500);
             res.json(util.successFalse(err, '북마크 생성 실패.'));
         });
 };
 
-exports.bookmarkList = (req, res) => { // item_selling이 false면 출력되지 않는 버그 있음
+exports.bookmarkList = (req, res) => {
     var queryFoldername = querystring.unescape(req.query.foldername); // 폴더 이름
     let promises = [];
 
     if (!(queryFoldername === 'null' || queryFoldername === 'undefined')) { // 폴더 이름이 빈 값이 아니라면
-        console.log('폴더 ' + queryFoldername + ' 내 북마크 조회 호출됨.');
+        console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 호출됨.');
         models.bookmark
             .findAll({
                 attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
@@ -41,23 +42,26 @@ exports.bookmarkList = (req, res) => { // item_selling이 false면 출력되지 
                     folder_name: queryFoldername
                 }
             })
-            .then(list => {
+            .then(list => { // 아직 만들지 않은 폴더라면 null값
                 for(let i = 0; i < list.length; i++){
-                    if (!list[i].dataValues.item_selling) continue;
-                    promises.push(naverController.checkItem(list[i]));
+                    if (!list[i].dataValues.item_selling) {
+                        console.log(list[i].dataValues.item_title + "판매 종료.");
+                        promises.push(list[i]);
+                    }
+                    else promises.push(naverController.checkItem(list[i]));
                 }
                 Promise.all(promises)
                 .then(allCheckedList => {
-                    console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.');
+                    console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.\n');
                     res.status(200);
                     res.json(util.successTrue(allCheckedList));
                 })
             })
             .catch(err => {
                 console.dir(err);
-                console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.')
+                console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.\n')
                 res.status(500);
-                res.json(util.successFalse(err, '폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.'));
+                res.json(util.successFalse(err, '폴더 "' + queryFoldername + '" 내 북마크 리스트 조회 실패.'));
             });
     }
     else {
@@ -70,23 +74,21 @@ exports.bookmarkList = (req, res) => { // item_selling이 false면 출력되지 
             })
             .then(list => {
                 for(let i = 0; i < list.length; i++){
-                    if (!list[i].dataValues.item_selling) 
-                        promises.push(list[i]);
-                    else
-                        promises.push(naverController.checkItem(list[i]));
+                    if (!list[i].dataValues.item_selling) promises.push(list[i]);
+                    else promises.push(naverController.checkItem(list[i]));
                 }
                 Promise.all(promises)
                 .then(allCheckedList => {
-                    console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.');
+                    console.log('사용자 ' + req.body.user_id + '의 전체 북마크 리스트 조회 완료.\n');
                     res.status(200);
                     res.json(util.successTrue(allCheckedList));
                 })
             })
             .catch(err => {
                 console.dir(err);
-                console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.')
+                console.log('사용자 ' + req.body.user_id + '의 전체 북마크 리스트 조회 실패.\n');
                 res.status(500);
-                res.json(util.successFalse(err, '폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 실패.'));
+                res.json(util.successFalse(err, '사용자 ' + req.body.user_id + '의 전체 북마크 리스트 조회 실패.'));
             });
         }
 };
@@ -107,14 +109,15 @@ exports.bookmarkFolderModify = (req, res) => {
         })
         .then(data => {
             console.dir(data);
+            console.log('북마크 폴더 이름 수정 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
-            console.log('북마크 폴더 수정 실패.');
+            console.log('북마크 폴더 수정 실패.\n');
             res.status(500);
-            res.json(util.successFalse(err, '북마크 폴더 수정 실패.'));
+            res.json(util.successFalse(err, '북마크 폴더 이름 수정 실패.'));
         });
 };
 
@@ -132,12 +135,13 @@ exports.bookmarkModify = (req, res) => { // 거의 안쓸 듯
         })
         .then(data => {
             console.dir(data);
+            console.log('개별 북마크 수정 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
-            console.log('개별 북마크 수정 실패.');
+            console.log('개별 북마크 수정 실패.\n');
             res.status(500);
             res.json(util.successFalse(err, '개별 북마크 수정 실패.'));
         });
@@ -156,12 +160,13 @@ exports.bookmarkFolderDelete = (req, res) => {
         })
         .then(data => {
             console.dir(data);
+            console.log('북마크 폴더 삭제 성공\n');
             res.status(200);
             res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
-            console.log('북마크 폴더 삭제 실패.');
+            console.log('북마크 폴더 삭제 실패.\n');
             res.status(500);
             res.json(util.successFalse(err, '북마크 폴더 삭제 실패.'));
         });
@@ -179,12 +184,13 @@ exports.bookmarkDelete = (req, res) => {
         })
         .then(data => {
             console.dir(data);
+            console.log('개별 북마크 삭제 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));
         })
         .catch(err => {
             console.dir(err);
-            console.log('개별 북마크 삭제 실패.');
+            console.log('개별 북마크 삭제 실패.\n');
             res.status(500);
             res.json(util.successFalse(err, '개별 북마크 삭제 실패.'));
         });

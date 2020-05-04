@@ -35,6 +35,8 @@ exports.search = (req, res) => {
 
 
 exports.searchToTitle = (req) => new Promise((resolve, reject) => {
+    let data = {};
+
     var options = {
 		q: req.query.query,
 		part: "snippet",
@@ -48,9 +50,13 @@ exports.searchToTitle = (req) => new Promise((resolve, reject) => {
 
 	request.get(youtubeUrl, function(err, response, body){
 		if(!err && response.statusCode == 200){
+            let searchResult = JSON.parse(body).items;
             console.log('유튜브 API 검색 성공');
-            let data = JSON.parse(body).items;
-            resolve(data);
+            // for(let i = 0; i < searchResult.length; i++){
+            // data.youtubeData0 = searchResult[0];
+            // data.youtubeData1 = searchResult[1];
+            // }
+            resolve(searchResult);
         }
         else {
             console.dir(err);
