@@ -13,6 +13,7 @@ let date = moment().format("YYYY-MM-DD HH:mm:ss");
 let request = require("request");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const iconv = require('iconv-lite');
 
 /* itemDetail */
 const naverController = require('./naverController.js');
@@ -31,9 +32,26 @@ exports.spec = (req, res) => {
       res.status(409);
       res.json(util.successFalse(err, '스펙 크롤링 에러.'));
     })
-    
+
 };
 
+exports.ppoumpuHotdeal = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('뽐뿌 크롤링 호출됨.');
+  let page = querystring.stringify(req.query);
+  ppoumpuHotdeal(page, function (err, data) {
+    if (err) {
+      console.log('뽐뿌 크롤링 에러.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '뽐뿌 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+    }
+  })
+};
 
 exports.ruliwebHotdeal = (req, res) => {
   console.log("검색 요청 시간 : ", date);
@@ -100,7 +118,7 @@ let crawlSpec = async function (keyword, page) {
   const start = Date.now();
   let data = {};
   let url = 'http://search.danawa.com/dsearch.php?k1=' + keyword + '&module=goods&act=dispMain';
-  
+
   try {
     await page.goto(url, pageOption);
     // const productCodeList = await productCode(page);
@@ -114,20 +132,20 @@ let crawlSpec = async function (keyword, page) {
   }
 };
 
-function delay( timeout ) {
-	return new Promise(( resolve ) => {
-		setTimeout( resolve, timeout );
-	});
+function delay(timeout) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
 }
 
-let specList = async function(page) {
+let specList = async function (page) {
 
   const dataSelector = '#productListArea > div.main_prodlist.main_prodlist_list > ul > li:nth-child(1) > div > div.prod_info > dl > dd > div';
 
   const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
-  
+
   console.log(crawledSpecList);
-  
+
   return Promise.resolve(crawledSpecList);
 };
 
@@ -158,6 +176,62 @@ var ruriwebCrawl = (pageNum, callback) => {
 };
 
 
+const ppoumpuHotdeal = async (page, callback) => {
+  try {
+    link = "http://www.ppomppu.co.kr/zboard/zboard.php?" + page
+    const response = await axios.request({
+      method: "GET",
+      url: link,
+      responseType: "arraybuffer",
+      responseEncoding: "binary"
+    });
+    if (response.status == 200) {
+      const html = iconv.decode(response.data, "euc-kr").toString();
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("[class$='list1']")
+      const $bodyList0 = $("[class$='list0']")
+
+      $bodyList.each(function (i, elem) {
+        ulList[2 * i] = {
+          id: $(this).find('td.eng.list_vspace').text().trim().slice(0, 6),
+          category: $(this).find('nobr.han4.list_vspace').text().trim(),
+          title: $(this).find('font.list_title').text().trim(),
+          Url: link + $(this).find('td > a').attr('href'),
+          replyCount: $(this).find('span.list_comment2 span').text(),
+          hit: $(this).find('td.eng.list_vspace').text(),
+          time: $(this).find('nobr.eng.list_vspace').text().trim()
+        };
+      });
+
+      $bodyList0.each(function (i, elem) {
+        ulList[2 * i + 1] = {
+          id: $(this).find('td.eng.list_vspace').text().trim().slice(0, 6),
+          category: $(this).find('nobr.han4.list_vspace').text().trim(),
+          title: $(this).find('font.list_title').text().trim(),
+          Url: link + $(this).find('td > a').attr('href'),
+          replyCount: $(this).find('span.list_comment2 span').text(),
+          hit: $(this).find('td.eng.list_vspace').text(),
+          time: $(this).find('nobr.eng.list_vspace').text().trim()
+        };
+      });
+      // console.log(ulList)
+      // sJoon = []
+      // sJoon[j] = JSON.stringify(ulList)
+      // console.log(sJoon)
+      const data = ulList;
+      console.log(data);
+      callback(null, data);
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// ppoumpuHotdeal(10, ppomppuBoard[0])
+
+
 exports.itemDetail = (req, res) => {
   let promises = [];
 
@@ -165,19 +239,19 @@ exports.itemDetail = (req, res) => {
   promises.push(youtubeController.searchToTitle(req));
 
   Promise.all(promises)
-      .then(detailData => {
-          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
-          res.status(200);
-          console.log(detailData[0]); // spec
-          console.log(detailData[1][0]); // youtube data
-          res.json(util.successTrue(detailData));
-      })
-      .catch(err => {
-          console.dir(err);
-          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
-          res.status(500);
-          res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
-      });
+    .then(detailData => {
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
+      res.status(200);
+      console.log(detailData[0]); // spec
+      console.log(detailData[1][0]); // youtube data
+      res.json(util.successTrue(detailData));
+    })
+    .catch(err => {
+      console.dir(err);
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
+      res.status(500);
+      res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
+    });
 }
 
 // let productCode = async function(page){
