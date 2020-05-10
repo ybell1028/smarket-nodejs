@@ -31,7 +31,19 @@ exports.spec = (req, res) => {
       res.status(409);
       res.json(util.successFalse(err, '스펙 크롤링 에러.'));
     })
-    
+
+  // danawaCrawl(keyword, function (err, data) {
+  //   if (err) {
+  //     console.log('다나와 크롤링 에러.');
+  //     console.dir(err);
+  //     res.status(409);
+  //     res.json(util.successFalse(err, '다나와 크롤링 에러.'));
+
+  //   } else {
+  //     res.status(200);
+  //     res.json(util.successTrue(data));
+  //   }
+  // })  
 };
 
 
@@ -98,16 +110,21 @@ const browserOption = {
 
 let crawlSpec = async function (keyword, page) {
   const start = Date.now();
-  let data = {};
   let url = 'http://search.danawa.com/dsearch.php?k1=' + keyword + '&module=goods&act=dispMain';
   
   try {
     await page.goto(url, pageOption);
-    // const productCodeList = await productCode(page);
+    let productCode = await extractProductCode(page);
+    url = 'http://prod.danawa.com/info/?pcode=' + productCode[0];
+    await page.goto(url, pageOption);
+    let spec = await specList(page);
+    let str = "";
+    for(let i = 0; i < spec.length; i++){
+      str += spec[i];
+      str += '\n';
+    }
     console.log('Took', Date.now() - start, 'ms');
-    await delay(500);
-    data.spec = await specList(page);
-    return data;
+    return str;
   } catch (err) {
     throw err;
   } finally {
@@ -115,22 +132,68 @@ let crawlSpec = async function (keyword, page) {
 };
 
 function delay( timeout ) {
-	return new Promise(( resolve ) => {
-		setTimeout( resolve, timeout );
-	});
+   return new Promise(( resolve ) => {
+      setTimeout( resolve, timeout );
+   });
 }
 
-let specList = async function(page) {
+// let specList = async function(page) {
 
-  const dataSelector = '#productListArea > div.main_prodlist.main_prodlist_list > ul > li:nth-child(1) > div > div.prod_info > dl > dd > div';
+//   const dataSelector = '#productListArea > div.main_prodlist.main_prodlist_list > ul > li:nth-child(1) > div > div.prod_info > dl > dd > div';
 
-  const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
+//   const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
   
-  console.log(crawledSpecList);
+//   console.log(crawledSpecList);
   
-  return Promise.resolve(crawledSpecList);
-};
+//   return Promise.resolve(crawledSpecList);
+// };
 
+let extractProductCode = async function(page) {
+  let rawCodeStr = await page.evaluate(()=> {
+     return document.getElementById('relationProductCodeList').value;
+   });
+
+  let productCodeList = await rawCodeStr.split(',');
+
+  console.log(productCodeList);
+
+  return Promise.resolve(productCodeList);
+}
+
+let specList = async function (page) {
+  let bodyList = await page.evaluate(() => {
+    const rows = document.querySelectorAll('#productDescriptionArea > div > div.prod_spec > table > tbody tr');
+    const table = Array.from(rows);
+    return table.map(td => td.innerText);
+    // return table;
+    // return Array.from(rows, row => {
+    // let tableheader = row.querySelectorAll('th');
+    // // let tabledata = row.querySelectorAll('td');
+    // spec = [];
+    // // for(let i = 0; i < tabledata.length; i++){
+    // //   // spec.push(tableheader[i].textContent);
+    // //   spec.push(tabledata[i].innerText);
+    // // }
+    // console.log(tabledata.innerText);
+    // return spec;
+    // const columns = row.querySelectorAll('td');
+    // return Array.from(columns, column => column.innerText);
+    // });
+  });
+
+  return Promise.resolve(bodyList);
+}
+
+
+// let specList = async function(page) { //이 페이지는 그페이지가 아니군
+//   const dataSelector = '#productDescriptionArea > div > div.prod_spec > table > tbody > tr:nth-child(1) > td:nth-child(4)';
+
+//   const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
+
+//   console.log(crawledSpecList);
+
+//   return Promise.resolve(crawledSpecList);
+// }
 
 var ruriwebCrawl = (pageNum, callback) => {
   url = "https://bbs.ruliweb.com/market/board/1020?page=" + String(pageNum);
@@ -157,6 +220,17 @@ var ruriwebCrawl = (pageNum, callback) => {
   })
 };
 
+let danawaCrawl = (keyword, callback) => {
+  url = "http://search.danawa.com/dsearch.php?k1=" + encodeURI(keyword) + "&module=goods&act=dispMain";
+  request(url, (err, response, body) => {
+    if (err) callback(err, null);
+    console.log(body);
+    const $ = cheerio.load(body);
+    $("#relationProductCodeList").is(":visible"); 
+    console.log($("#relationProductCodeList").text());
+  })
+};
+
 
 exports.itemDetail = (req, res) => {
   let promises = [];
@@ -166,24 +240,16 @@ exports.itemDetail = (req, res) => {
 
   Promise.all(promises)
       .then(detailData => {
-          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
+          console.log('상품 ' + req.query.query + ' 상세 정보 조회 완료.');
           res.status(200);
           console.log(detailData[0]); // spec
-          console.log(detailData[1][0]); // youtube data
+          // console.log(detailData[1][0]); // youtube data
           res.json(util.successTrue(detailData));
       })
       .catch(err => {
           console.dir(err);
-          console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
+          console.log('상품 ' + req.query.query + ' 상세 정보 조회 실패.')
           res.status(500);
-          res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
+          res.json(util.successFalse(err, '상품' + req.query.query + ' 상세 정보 조회 실패.'));
       });
 }
-
-// let productCode = async function(page){
-//   const productCode = await page.evaluate(() => {
-//     return document.getElementById('relationProductCodeList').value;
-//   });
-//   console.log(productCode[0]);
-//   return Promise.resolve(productCode);
-// }

@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cluster = module.exports = require('cluster');
 cluster.schedulingPolicy = cluster.SCHED_RR;
-const numCPUs = require('os').cpus().length;
 const cors = require('cors');
 const util = require('./middleware/util');
 

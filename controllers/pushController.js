@@ -8,13 +8,13 @@ admin.initializeApp({
 
 exports.sendPush = (req, res) => {
 
-  var pushToken = req.body.token;
+  var pushToken = req.body.pushtoken;
   
   // 보낼 메시지를 작성하는 부분 입니다.
   var message = {
     data: {
-      title: '거기 집게리아 맞죠',
-      body: '아뇨 뚱인데요'
+      title: req.body.pushtitle,
+      body: req.body.pushbody
     },
     token: pushToken
   

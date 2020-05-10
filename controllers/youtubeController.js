@@ -35,8 +35,6 @@ exports.search = (req, res) => {
 
 
 exports.searchToTitle = (req) => new Promise((resolve, reject) => {
-    let data = {};
-
     var options = {
 		q: req.query.query,
 		part: "snippet",
