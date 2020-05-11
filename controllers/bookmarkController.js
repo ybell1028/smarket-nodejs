@@ -30,7 +30,7 @@ exports.bookmarkCreate = (req, res) => {
 
 exports.bookmarkList = (req, res) => {
     var queryFoldername = querystring.unescape(req.query.foldername); // 폴더 이름
-    let promises;
+    let promises = [];
 
     if (!(queryFoldername === 'null' || queryFoldername === 'undefined')) { // 폴더 이름이 빈 값이 아니라면
         console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 호출됨.');
@@ -42,22 +42,8 @@ exports.bookmarkList = (req, res) => {
                     folder_name: queryFoldername
                 }
             })
-            .then(async list => { // 아직 만들지 않은 폴더라면 null값
-                promises = list.map(data => {
-                    if (!data.dataValues.item_selling) {
-                        console.log(data.dataValues.item_title + "판매 종료.");
-                    }
-                    else {
-                        return naverController.checkItem(data);
-                    }
-                    delay(110);
-                });
-                await Promise.all(promises)
-                .then(allCheckedList => {
-                    console.log('폴더 ' + queryFoldername + ' 내 북마크 리스트 조회 완료.\n');
-                    res.status(200);
-                    res.json(util.successTrue(allCheckedList));
-                })
+            .then(list => {
+                isSelling(res, list, promises, null, queryFoldername);
             })
             .catch(err => {
                 console.dir(err);
@@ -74,22 +60,8 @@ exports.bookmarkList = (req, res) => {
                     user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
                 }
             })
-            .then(async list => { // 아직 만들지 않은 폴더라면 null값
-                promises = list.map(data => {
-                    if (!data.dataValues.item_selling) {
-                        console.log(data.dataValues.item_title + "판매 종료.");
-                    }
-                    else {
-                        return naverController.checkItem(data);
-                    }
-                    delay(110);
-                });
-                await Promise.all(promises)
-                    .then(allCheckedList => {
-                        console.log('사용자 ' + req.body.user_id + '의 전체 북마크 리스트 조회 완료.\n');
-                        res.status(200);
-                        res.json(util.successTrue(allCheckedList));
-                    })
+            .then(list => { // 아직 만들지 않은 폴더라면 null값
+                isSelling(res, list, promises, req.body.user_id, null);
             })
             .catch(err => {
                 console.dir(err);
@@ -209,3 +181,26 @@ let delay = function ( timeout ) {
        setTimeout( resolve, timeout );
     });
  }
+
+let isSelling = function (res, list, promises, id, foldername) {
+    for (let i = 0; i < list.length; i++) {
+        setTimeout(() => {
+            if (!list[i].dataValues.item_selling) {
+                promises.push(list[i]);
+                console.log(list[i].dataValues.item_title + "판매 종료.");
+            }
+            else {
+                promises.push(naverController.checkItem(list[i]));
+            }
+            if (promises.length == list.length) {
+                Promise.all(promises)
+                    .then(allCheckedList => {
+                        if(id === null) console.log('폴더 ' + foldername + ' 내 북마크 리스트 조회 완료.\n');
+                        else if(foldername === null) console.log('사용자 ' + id + '의 전체 북마크 리스트 조회 완료.\n')
+                        res.status(200);
+                        res.json(util.successTrue(allCheckedList));
+                    })
+            }
+        }, 100 * i)
+    }
+}
