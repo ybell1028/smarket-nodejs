@@ -13,6 +13,7 @@ let date = moment().format("YYYY-MM-DD HH:mm:ss");
 let request = require("request");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const iconv = require('iconv-lite');
 
 /* itemDetail */
 const naverController = require('./naverController.js');
@@ -32,20 +33,25 @@ exports.spec = (req, res) => {
       res.json(util.successFalse(err, '스펙 크롤링 에러.'));
     })
 
-  // danawaCrawl(keyword, function (err, data) {
-  //   if (err) {
-  //     console.log('다나와 크롤링 에러.');
-  //     console.dir(err);
-  //     res.status(409);
-  //     res.json(util.successFalse(err, '다나와 크롤링 에러.'));
-
-  //   } else {
-  //     res.status(200);
-  //     res.json(util.successTrue(data));
-  //   }
-  // })  
 };
 
+exports.ppoumpuHotdeal = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('뽐뿌 크롤링 호출됨.');
+  let page = querystring.stringify(req.query);
+  ppoumpuHotdeal(page, function (err, data) {
+    if (err) {
+      console.log('뽐뿌 크롤링 에러.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '뽐뿌 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+    }
+  })
+};
 
 exports.ruliwebHotdeal = (req, res) => {
   console.log("검색 요청 시간 : ", date);
@@ -110,90 +116,39 @@ const browserOption = {
 
 let crawlSpec = async function (keyword, page) {
   const start = Date.now();
+  let data = {};
   let url = 'http://search.danawa.com/dsearch.php?k1=' + keyword + '&module=goods&act=dispMain';
-  
+
   try {
     await page.goto(url, pageOption);
-    let productCode = await extractProductCode(page);
-    url = 'http://prod.danawa.com/info/?pcode=' + productCode[0];
-    await page.goto(url, pageOption);
-    let spec = await specList(page);
-    let str = "";
-    for(let i = 0; i < spec.length; i++){
-      str += spec[i];
-      str += '\n';
-    }
+    // const productCodeList = await productCode(page);
     console.log('Took', Date.now() - start, 'ms');
-    return str;
+    await delay(500);
+    data.spec = await specList(page);
+    return data;
   } catch (err) {
     throw err;
   } finally {
   }
 };
 
-function delay( timeout ) {
-   return new Promise(( resolve ) => {
-      setTimeout( resolve, timeout );
-   });
-}
-
-// let specList = async function(page) {
-
-//   const dataSelector = '#productListArea > div.main_prodlist.main_prodlist_list > ul > li:nth-child(1) > div > div.prod_info > dl > dd > div';
-
-//   const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
-  
-//   console.log(crawledSpecList);
-  
-//   return Promise.resolve(crawledSpecList);
-// };
-
-let extractProductCode = async function(page) {
-  let rawCodeStr = await page.evaluate(()=> {
-     return document.getElementById('relationProductCodeList').value;
-   });
-
-  let productCodeList = await rawCodeStr.split(',');
-
-  console.log(productCodeList);
-
-  return Promise.resolve(productCodeList);
+function delay(timeout) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
 }
 
 let specList = async function (page) {
-  let bodyList = await page.evaluate(() => {
-    const rows = document.querySelectorAll('#productDescriptionArea > div > div.prod_spec > table > tbody tr');
-    const table = Array.from(rows);
-    return table.map(td => td.innerText);
-    // return table;
-    // return Array.from(rows, row => {
-    // let tableheader = row.querySelectorAll('th');
-    // // let tabledata = row.querySelectorAll('td');
-    // spec = [];
-    // // for(let i = 0; i < tabledata.length; i++){
-    // //   // spec.push(tableheader[i].textContent);
-    // //   spec.push(tabledata[i].innerText);
-    // // }
-    // console.log(tabledata.innerText);
-    // return spec;
-    // const columns = row.querySelectorAll('td');
-    // return Array.from(columns, column => column.innerText);
-    // });
-  });
 
-  return Promise.resolve(bodyList);
-}
+  const dataSelector = '#productListArea > div.main_prodlist.main_prodlist_list > ul > li:nth-child(1) > div > div.prod_info > dl > dd > div';
 
+  const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
 
-// let specList = async function(page) { //이 페이지는 그페이지가 아니군
-//   const dataSelector = '#productDescriptionArea > div > div.prod_spec > table > tbody > tr:nth-child(1) > td:nth-child(4)';
+  console.log(crawledSpecList);
 
-//   const crawledSpecList = await page.$eval(dataSelector, data => data.textContent.trim());
+  return Promise.resolve(crawledSpecList);
+};
 
-//   console.log(crawledSpecList);
-
-//   return Promise.resolve(crawledSpecList);
-// }
 
 var ruriwebCrawl = (pageNum, callback) => {
   url = "https://bbs.ruliweb.com/market/board/1020?page=" + String(pageNum);
@@ -220,16 +175,61 @@ var ruriwebCrawl = (pageNum, callback) => {
   })
 };
 
-let danawaCrawl = (keyword, callback) => {
-  url = "http://search.danawa.com/dsearch.php?k1=" + encodeURI(keyword) + "&module=goods&act=dispMain";
-  request(url, (err, response, body) => {
-    if (err) callback(err, null);
-    console.log(body);
-    const $ = cheerio.load(body);
-    $("#relationProductCodeList").is(":visible"); 
-    console.log($("#relationProductCodeList").text());
-  })
+
+const ppoumpuHotdeal = async (page, callback) => {
+  try {
+    link = "http://www.ppomppu.co.kr/zboard/zboard.php?" + page
+    const response = await axios.request({
+      method: "GET",
+      url: link,
+      responseType: "arraybuffer",
+      responseEncoding: "binary"
+    });
+    if (response.status == 200) {
+      const html = iconv.decode(response.data, "euc-kr").toString();
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("[class$='list1']")
+      const $bodyList0 = $("[class$='list0']")
+
+      $bodyList.each(function (i, elem) {
+        ulList[2 * i] = {
+          id: $(this).find('td.eng.list_vspace').text().trim().slice(0, 6),
+          category: $(this).find('nobr.han4.list_vspace').text().trim(),
+          title: $(this).find('font.list_title').text().trim(),
+          Url: link + $(this).find('td > a').attr('href'),
+          replyCount: $(this).find('span.list_comment2 span').text(),
+          hit: $(this).find('td.eng.list_vspace').text(),
+          time: $(this).find('nobr.eng.list_vspace').text().trim()
+        };
+      });
+
+      $bodyList0.each(function (i, elem) {
+        ulList[2 * i + 1] = {
+          id: $(this).find('td.eng.list_vspace').text().trim().slice(0, 6),
+          category: $(this).find('nobr.han4.list_vspace').text().trim(),
+          title: $(this).find('font.list_title').text().trim(),
+          Url: link + $(this).find('td > a').attr('href'),
+          replyCount: $(this).find('span.list_comment2 span').text(),
+          hit: $(this).find('td.eng.list_vspace').text(),
+          time: $(this).find('nobr.eng.list_vspace').text().trim()
+        };
+      });
+      // console.log(ulList)
+      // sJoon = []
+      // sJoon[j] = JSON.stringify(ulList)
+      // console.log(sJoon)
+      const data = ulList;
+      console.log(data);
+      callback(null, data);
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
+
+// ppoumpuHotdeal(10, ppomppuBoard[0])
 
 
 exports.itemDetail = (req, res) => {
@@ -239,17 +239,25 @@ exports.itemDetail = (req, res) => {
   promises.push(youtubeController.searchToTitle(req));
 
   Promise.all(promises)
-      .then(detailData => {
-          console.log('상품 ' + req.query.query + ' 상세 정보 조회 완료.');
-          res.status(200);
-          console.log(detailData[0]); // spec
-          // console.log(detailData[1][0]); // youtube data
-          res.json(util.successTrue(detailData));
-      })
-      .catch(err => {
-          console.dir(err);
-          console.log('상품 ' + req.query.query + ' 상세 정보 조회 실패.')
-          res.status(500);
-          res.json(util.successFalse(err, '상품' + req.query.query + ' 상세 정보 조회 실패.'));
-      });
+    .then(detailData => {
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
+      res.status(200);
+      console.log(detailData[0]); // spec
+      console.log(detailData[1][0]); // youtube data
+      res.json(util.successTrue(detailData));
+    })
+    .catch(err => {
+      console.dir(err);
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
+      res.status(500);
+      res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
+    });
 }
+
+// let productCode = async function(page){
+//   const productCode = await page.evaluate(() => {
+//     return document.getElementById('relationProductCodeList').value;
+//   });
+//   console.log(productCode[0]);
+//   return Promise.resolve(productCode);
+// }

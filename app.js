@@ -14,9 +14,9 @@ const api = require('./routes/api');
 const app = express();
 
 //environment
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8090);
 app.use(cors());
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -26,10 +26,10 @@ app.use('/api', api);
 /* sequelize setting */
 const models = require("./models/index.js");
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.status(404);
     res.json(util.successFalse({
-        name:'404 Not Found'
+        name: '404 Not Found'
     }, '404 Not Found'));
 });
 
@@ -43,7 +43,7 @@ models.sequelize.sync().then(() => {
 /* cluster(multithread) setting */
 
 // if (cluster.isMaster) {
-    
+
 //     for (let i = 1; i <= numCPUs; i++) {
 //         console.log('worker process create[' + i + ']');
 //         cluster.fork();
@@ -52,12 +52,12 @@ models.sequelize.sync().then(() => {
 //     cluster.on('listening', function(worker, address) {
 //         console.log("Worker " + worker.id + " is now connected to " + address.address + ":" + address.port);
 //     });
- 
+
 //     cluster.on('exit',function(worker, code, signal){
 //         console.log(`worker ${worker.process.pid} died`);
 //         cluster.fork();
 //     });
- 
+
 // } else {
 //     http.createServer(app).listen(app.get('port'), function () {
 //         console.log('slave server '+cluster.worker.process.pid);
@@ -66,6 +66,7 @@ models.sequelize.sync().then(() => {
 
 
 // 싱글 스레드
+//"192.168.27.209"
 http.createServer(app).listen(app.get('port'), function () {
     console.log('server is running');
 });
