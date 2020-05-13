@@ -17,4 +17,6 @@ router.get("/detail", crawlingController.itemDetail);
 // 사용 예시 : api/crawling/ppomppu?id=ppomppu5&page=1 오프라인 뽐뿌게시판의 1page 
 router.get("/ppomppu", crawlingController.ppoumpuHotdeal);
 
+// GET api/crawling/fmhotdeal/페이지 번호 - 속도가 빠르기 때문에 한 페이지씩 가져와도 될것같음
+router.get("/fmhotdeal/:pageNum", crawlingController.fmHotdeal)
 module.exports = router;

@@ -71,6 +71,80 @@ exports.ruliwebHotdeal = (req, res) => {
   })
 };
 
+exports.fmHotdeal = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('fm핫딜 크롤링 호출됨.');
+  let page = req.params.pageNum;
+  fmHotdeal(page, function (err, data) {
+    if (err) {
+      console.log('fm핫딜 크롤링 에러.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, 'fm핫딜 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+    }
+  })
+};
+
+const fmHotdeal = async (pageNum, callback) => {
+  try {
+    link = "https://www.fmkorea.com/index.php?mid=hotdeal&sort_index=pop&order_type=desc&listStyle=webzine&page=" + pageNum
+    const response = await axios({
+      method: "GET",
+      url: link,
+      headers:
+      {
+        // ":authority": 'loader.fmkorea.com',
+        "method": 'GET',
+        "path": '/_myphp/adpost/content_new.php?url=https%3A%2F%2Fwww.fmkorea.com%2Findex.php%3Fmid%3Dhotdeal%26sort_index%3Dpop%26order_type%3Ddesc%26listStyle%3Dwebzine&ref=&m=0&c=1589354285354',
+        "scheme": 'https',
+        "accept": 'application / json, text/ javascript */*; q=0.01',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'ko- KR, ko; q = 0.9, en - US; q = 0.8, en; q = 0.7',
+        'origin': 'https://www.fmkorea.com',
+        'referer': 'https://www.fmkorea.com/index.php?mid=hotdeal&sort_index=pop&order_type=desc&listStyle=webzine',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site',
+        'user-agent': 'Mozilla / 5.0(Windows NT 10.0; Win64; x64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 81.0.4044.138 Safari / 537.36',
+      }
+
+    });
+
+    if (response.status == 200) {
+      const html = response.data;
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("[class$='li ']")
+
+      $bodyList.each(function (i, elem) {
+        ulList[i] = {
+          // id: $(this).find('div.li span.label').text(),
+          rank: $(this).find('div.li span.count').text(),
+          // img: $(this).find('div.li img.thumb').attr('src'),
+          category: $(this).find('span.category').text().replace(/\//gi, "").trim(),
+          title: $(this).find('h3.title a,hotdeal_var8').text().trim(),
+          info: $(this).find('div.hotdeal_info span a').text().trim(),
+          Url: link + $(this).find('h3.title a,hotdeal_var8').attr('href'),
+          // replyCount: $(this).find('div hotdeal_info span a').text(),
+          // hit: $(this).find('td.eng.list_vspace').text(),
+          time: $(this).find('span.regdate').text().trim(),
+
+        };
+      });
+
+      const data = ulList;
+      console.log(data);
+      callback(null, data)
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const pageOption = {
   waitUntil: 'networkidle2'
 };
