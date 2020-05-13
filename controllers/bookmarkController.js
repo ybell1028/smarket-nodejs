@@ -201,6 +201,6 @@ let isSelling = function (res, list, promises, id, foldername) {
                         res.json(util.successTrue(allCheckedList));
                     })
             }
-        }, 100 * i)
+        }, 120 * i)
     }
 }

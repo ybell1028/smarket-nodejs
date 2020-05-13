@@ -8,8 +8,8 @@ admin.initializeApp({
 
 exports.sendPush = (req, res) => {
 
-  var pushToken = req.body.pushtoken;
-  
+  var pushToken = req.headers['x-push-token'];
+
   // 보낼 메시지를 작성하는 부분 입니다.
   var message = {
     data: {
@@ -17,16 +17,19 @@ exports.sendPush = (req, res) => {
       body: req.body.pushbody
     },
     token: pushToken
-  
   };
   
   admin.messaging().send(message)
     .then((response) => {
       // Response is a message ID string.
-      console.log('푸시 메세지 수신 성공 : ', response);
+      console.log('푸시 메세지 전송 성공 : ', response);
+      res.status(200);
+      res.send('푸시 메세지 전송 성공');
     })
-    .catch((error) => {
-      console.log('푸시 메세지 수신 중 에러 발생', error);
+    .catch((err) => {
+      console.log('푸시 메세지 전송 중 에러 발생', error);
+      res.status(500);
+      res.send(err);
     });
 }
 

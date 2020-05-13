@@ -14,7 +14,7 @@ const api = require('./routes/api');
 const app = express();
 
 //environment
-app.set('port', process.env.PORT || 8090);
+app.set('port', process.env.PORT || 3000);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
