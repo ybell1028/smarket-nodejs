@@ -186,6 +186,9 @@ let isSelling = function (res, list, promises, id, foldername) {
     for (let i = 0; i < list.length; i++) {
         setTimeout(() => {
             if (!list[i].dataValues.item_selling) {
+                item.dataValues.item_lprice = null;
+                item.dataValues.item_link = null;
+                item.dataValues.item_image = null;
                 promises.push(list[i]);
                 console.log(list[i].dataValues.item_title + "판매 종료.");
             }
