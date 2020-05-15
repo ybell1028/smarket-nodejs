@@ -18,6 +18,9 @@ router.get("/ppomppu", crawlingController.ppoumpuHotdeal);
 router.get("/fmhotdeal/:pageNum", crawlingController.fmHotdeal)
 
 // GET api/crawling/clienhotdeal/페이지 번호 - 속도가 빠르기 때문에 한 페이지씩 가져와도 될것같음
-router.get("/clienhotdeal/:pageNum", crawlingController.clienHotdeal)
+router.get("/clien/:pageNum", crawlingController.clien)
+
+// GET api/crawling/coolenjoy/페이지 번호 - 속도가 빠르기 때문에 한 페이지씩 가져와도 될것같음
+router.get("/coolenjoy/:pageNum", crawlingController.coolEnjoy)
 
 module.exports = router;

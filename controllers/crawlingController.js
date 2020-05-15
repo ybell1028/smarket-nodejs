@@ -69,11 +69,11 @@ exports.fmHotdeal = (req, res) => {
   })
 };
 
-exports.clienHotdeal = (req, res) => {
+exports.clien = (req, res) => {
   console.log("검색 요청 시간 : ", date);
   console.log('클리앙 알뜰구매 크롤링 호출됨.');
   let page = req.params.pageNum;
-  clienHotdeal(page, function (err, data) {
+  clien(page, function (err, data) {
     if (err) {
       console.log('클리앙 알뜰구매 크롤링 성공.');
       console.dir(err);
@@ -87,7 +87,86 @@ exports.clienHotdeal = (req, res) => {
     }
   })
 };
-const clienHotdeal = async (pageNum, callback) => {
+
+exports.coolEnjoy = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('쿨엔조이 지름 크롤링 호출됨.');
+  let page = req.params.pageNum;
+  coolEnjoy(page, function (err, data) {
+    if (err) {
+      console.log('쿨엔조이 지름 크롤링 성공.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '쿨엔조이 지름 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('쿨엔조이 지름 크롤링 성공.\n');
+    }
+  })
+};
+const coolEnjoy = async (pageNum, callback) => {
+  try {
+    link = "http://www.coolenjoy.net/bbs/jirum/p" + pageNum
+    const response = await axios({
+      method: "GET",
+      url: link,
+      // headers:
+      // {
+      //   "scheme": 'https',
+      //   "accept": 'application / json, text/ javascript */*; q=0.01',
+      //   'accept-encoding': 'gzip, deflate, br',
+      //   'accept-language': 'ko- KR, ko; q = 0.9, en - US; q = 0.8, en; q = 0.7',
+      //   "Connection": 'keep-alive',
+      //   "Cookie": 'SESSION=2aa1770f-d213-42d4-9993-280d008bca90; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.896276763.1589517326',
+      //   'Host': 'www.clien.net',
+      //   'referer': link,
+      //   'sec-fetch-dest': 'empty',
+      //   'sec-fetch-mode': 'cors',
+      //   'sec-fetch-site': 'same-origin',
+      //   'user-agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+      //   'X-Requested-With': 'XMLHttpRequest',
+      // }
+
+    });
+
+    if (response.status == 200) {
+      const html = response.data;
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("#fboardlist > div > table > tbody > tr").not('.bo_notice')
+
+      $bodyList.each(function (i, elem) {
+        ulList[i] = {
+
+          category: $(this).find('td.td_num').text().trim(),
+          title: $(this).find('td.td_subject > a').text().split('댓')[0].trim(),
+          Url: $(this).find('td.td_subject > a').attr('href'),
+          replyCount: $(this).find('td.td_subject > a > span.cnt_cmt').text().trim().replace(/[^0-9]/g, ''),
+          hit: $(this).find('td:nth-child(5)').text().trim(),
+          time: $(this).find('td.td_date').text().trim(),
+
+        };
+        if (ulList[i].hit.match('k')) {
+          ulList[i].hit = ulList[i].hit.replace(/k/g, '000').replace(/\./g, '')
+        }
+        if (ulList[i].time.match('-')) {
+          ulList[i].time = ulList[i].time.replace(/-/g, '/')
+        }
+      });
+
+      const data = ulList;
+      console.log(data);
+      callback(null, data)
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const clien = async (pageNum, callback) => {
   try {
     link = "https://www.clien.net/service/board/jirum?&od=T31&po=" + (pageNum - 1)
     const response = await axios({
