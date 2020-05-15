@@ -386,7 +386,7 @@ const ppoumpuHotdeal = async (page, callback) => {
 
 // ppoumpuHotdeal(10, ppomppuBoard[0])
 
-const itemSpec = (keyword) => new Promise(async (resolve, reject) => {
+exports.itemSpec = (keyword) => new Promise(async (resolve, reject) => {
   try {
     search = await danawaSearch(keyword)
     formdata = querystring.stringify(
@@ -526,13 +526,10 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
 });
 
 exports.itemDetail = (req, res) => {
+  console.log('상품 상세 정보 조회 호출됨.');
 
-  let promises = []
-  promises.push(itemSpec(req.query.query));
-  promises.push(youtubeController.searchToTitle(req));
-
-  Promise.all(promises)
-    .then(detailData => {
+  youtubeController.searchToTitle(req)
+    .then(async detailData => {
       res.status(200);
       res.json(util.successTrue(detailData));
       console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.\n');

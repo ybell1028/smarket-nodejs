@@ -2,6 +2,7 @@ var {google} = require('googleapis');
 var request = require('request');
 var querystring = require('querystring');
 var util = require('../middleware/util');
+const crawlingController = require('./crawlingController.js');
 const YOUTUBE_API_KEY = 'AIzaSyC7YY58-0d5LffCoYBHUlYZCqFKOJawxwQ';
 
 exports.search = (req, res) => {
@@ -46,14 +47,17 @@ exports.searchToTitle = (req) => new Promise((resolve, reject) => {
 
 	var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
 
-	request.get(youtubeUrl, function(err, response, body){
+	request.get(youtubeUrl, async function(err, response, body){
 		if(!err && response.statusCode == 200){
-            let searchResult = JSON.parse(body).items;
+            let searchResult = [];
+            let spec = await crawlingController.itemSpec(req.query.query);
+            searchResult.push(spec[0]);
+            for(let i = 0;i < JSON.parse(body).items.length; i++){
+                searchResult.push(JSON.parse(body).items[i]);
+            }
+            
             console.log('유튜브 API 검색 성공');
-            // for(let i = 0; i < searchResult.length; i++){
-            // data.youtubeData0 = searchResult[0];
-            // data.youtubeData1 = searchResult[1];
-            // }
+
             resolve(searchResult);
         }
         else {
