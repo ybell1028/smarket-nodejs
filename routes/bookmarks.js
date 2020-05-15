@@ -23,11 +23,12 @@ router.get('/',
     validation.result,
     bookmarkController.bookmarkList);
 
-// GET api/bookmarks/bookmarkid - 해당 id의 북마크 조회
-// router.get('/:bookmarkid', 
-//     util.isLoggedin,
-//     validation.result,
-//     bookmarkController.bookmarkDetail);
+// GET api/bookmarks - 자신의 모든 폴더안에 있는 북마크  조회
+router.post('/lprice',
+    util.isLoggedin,
+    validation.user_id, // 토큰 안에 들어있음 - json 데이터 불필요
+    validation.result,
+    bookmarkController.bookmarkLprice);
 
 // PATCH api/bookmarks?foldername=폴더이름 - 북마크 폴더 이름 변경   
 router.patch('/', 

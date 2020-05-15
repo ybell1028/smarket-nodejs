@@ -1,12 +1,6 @@
-/* puppeteer */
-const models = require("../models");
 const util = require('../middleware/util');
-const puppeteer = require('puppeteer');
-let querystring = require('querystring'); // 다나와는 query에 utf-8을 지원해서 인코딩이 필요없는듯
-let page = null;
-
-/* cheerio */
-let moment = require("moment");
+const querystring = require('querystring'); // 다나와는 query에 utf-8을 지원해서 인코딩이 필요없는듯
+const moment = require("moment");
 require("moment-timezone");
 moment.tz.setDefault("Asia/Seoul");
 let date = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -14,19 +8,16 @@ let request = require("request");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const iconv = require('iconv-lite');
-
-/* itemDetail */
-const naverController = require('./naverController.js');
 const youtubeController = require('./youtubeController.js');
 
 
 exports.ppoumpuHotdeal = (req, res) => {
   console.log("검색 요청 시간 : ", date);
-  console.log('뽐뿌 크롤링 호출됨.');
+  console.log('뽐뿌 크롤링 호출됨.\n');
   let page = querystring.stringify(req.query);
   ppoumpuHotdeal(page, function (err, data) {
     if (err) {
-      console.log('뽐뿌 크롤링 에러.');
+      console.log('뽐뿌 크롤링 호출됨.\n');
       console.dir(err);
       res.status(409);
       res.json(util.successFalse(err, '뽐뿌 크롤링 에러.'));
@@ -34,17 +25,18 @@ exports.ppoumpuHotdeal = (req, res) => {
     } else {
       res.status(200);
       res.json(util.successTrue(data));
+      console.log('뽐뿌 크롤링 성공.\n');
     }
   })
 };
 
 exports.ruliwebHotdeal = (req, res) => {
   console.log("검색 요청 시간 : ", date);
-  console.log('루리웹 크롤링 호출됨.');
+  console.log('루리웹 크롤링 호출됨.\n');
   let page = req.params.pageNum;
   ruliwebCrawl(page, function (err, data) {
     if (err) {
-      console.log('루리웹 크롤링 에러.');
+      console.log('루리웹 크롤링 에러.\n');
       console.dir(err);
       res.status(409);
       res.json(util.successFalse(err, '루리웹 크롤링 에러.'));
@@ -52,24 +44,27 @@ exports.ruliwebHotdeal = (req, res) => {
     } else {
       res.status(200);
       res.json(util.successTrue(data));
+      console.log('루리웹 크롤링 성공.\n');
     }
   })
 };
 
+
 exports.fmHotdeal = (req, res) => {
   console.log("검색 요청 시간 : ", date);
-  console.log('fm핫딜 크롤링 호출됨.');
+  console.log('에펨코리아 크롤링 호출됨.\n');
   let page = req.params.pageNum;
   fmHotdeal(page, function (err, data) {
     if (err) {
-      console.log('fm핫딜 크롤링 에러.');
+      console.log('에펨코리아 크롤링 성공.\n');
       console.dir(err);
       res.status(409);
-      res.json(util.successFalse(err, 'fm핫딜 크롤링 에러.'));
+      res.json(util.successFalse(err, '에펨코리아 크롤링 에러.'));
 
     } else {
       res.status(200);
       res.json(util.successTrue(data));
+      console.log('에펨코리아 크롤링 성공.\n');
     }
   })
 };
@@ -123,12 +118,11 @@ const fmHotdeal = async (pageNum, callback) => {
       });
 
       const data = ulList;
-      console.log(data);
       callback(null, data)
 
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -156,7 +150,6 @@ const ruliwebCrawl = (pageNum, callback) => {
       }
     });
     const data = ulList;
-    console.log(data);
     callback(null, data);
   })
 };
@@ -229,8 +222,8 @@ const ppoumpuHotdeal = async (page, callback) => {
       callback(null, data);
 
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.err(err);
   }
 };
 
@@ -301,7 +294,7 @@ const itemSpec = (keyword) => new Promise(async (resolve, reject) => {
     }
 
   } catch (err) {
-    console.error(err);
+    console.log(err);
     reject(err);
   }
 });
@@ -366,17 +359,14 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
       });
 
       const data = ulList[0];
-      console.log(data);
       resolve(data);
     }
 
   } catch (err) {
-    console.error(err);
+    console.log(err);
     reject(err)
   }
 });
-
-
 
 exports.itemDetail = (req, res) => {
 
@@ -386,13 +376,13 @@ exports.itemDetail = (req, res) => {
 
   Promise.all(promises)
     .then(detailData => {
-      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.');
       res.status(200);
       res.json(util.successTrue(detailData));
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.\n');
     })
     .catch(err => {
       console.dir(err);
-      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.')
+      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.\n')
       res.status(500);
       res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
     });

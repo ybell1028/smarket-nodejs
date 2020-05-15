@@ -33,9 +33,8 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
     });
 };
 
-
 exports.checkItem = (item) => new Promise((resolve, reject) => {
-    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title) + '&display=20';
+    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title);
     let options = {
         url: naverUrl,
         headers: {
@@ -46,21 +45,20 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
     request.get(options, (err, response, body) => { // API에 요청
         let isSelling = false;
         if (!err && response.statusCode === 200) {
-            console.log(item.dataValues.item_title + ' 키워드 API 검색 성공');
+            console.log(item.dataValues.item_title + ' 키워드 API 검색 성공.');
             let apiData = JSON.parse(body).items;
             for (let j = 0; j < apiData.length; j++) { // apiData.length = items JSON 배열의 길이
                 if (apiData[j].productId === item.dataValues.item_id) {
-                    console.log('item_id와 일치하는 상품 존재');
+                    console.log('item_id와 일치하는 상품 존재.');
                     isSelling = true;
                     item.dataValues.item_lprice = apiData[j].lprice;
                     item.dataValues.item_link = apiData[j].link;
                     item.dataValues.item_image = apiData[j].image;
-                    console.log('item 정보 업데이트 완료');
                     break;
                 }
             }
             if (!isSelling) {
-                console.log('item_id와 일치하는 상품 존재하지 않음');
+                console.log('item_id와 일치하는 상품 존재하지 않음.');
                 item.dataValues.item_selling = false;
                 models.bookmark.update({
                     item_selling: false
@@ -70,22 +68,23 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
                         user_id: item.dataValues.user_id, // userid와 혼동하지 말것
                     }
                 })
-                    .then(data => {
-                        console.log('item_selling 변경 완료');
-                        resolve(item);
-                    })
-                    .catch(err => {
-                        console.log('item_selling 변경 완료');
-                        reject(err);
-                    });
+                .then(data => {
+                    console.log('item_selling 변경 완료.\n');
+                    resolve(item);
+                })
+                .catch(err => {
+                   console.log('item_selling 변경 실패.\n');
+                   reject(err);
+                });
             }
             else {
+                console.log('item 정보 업데이트 완료.\n');
                 resolve(item);
             }
         }
         else {
             console.dir(err);
-            console.log(item.dataValues.item_title + ' 키워드 API 검색 실패');
+            console.log(item.dataValues.item_title + ' 키워드 API 검색 실패.\n');
             reject(err);
         }
     })

@@ -66,7 +66,7 @@ exports.userPasswordConfirm = async (req, res) => {
                 console.log('비밀번호가 일치함.');
                 console.log(data.dataValues.user_id + ' 비밀번호 인증됨.');
                 res.status(200);
-                res.json(util.successTrue(null));
+                res.json(util.successTrue());
             }
             else {
                 res.status(409); // 409는 서버가 요청을 처리하는 과정에서 충돌이 발생한 경우입니다. (회원가입을 했는데 이미 사용하고 있는 아이디인 경우, 비밀번호가 틀린 경우 등)

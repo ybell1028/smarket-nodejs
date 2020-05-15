@@ -18,7 +18,6 @@ module.exports = {
             },
             item_id: {
                 type: Sequelize.STRING,
-                unique: true,
                 allowNull: false
             },
             item_title: {

@@ -5,6 +5,7 @@ var jwtConfig = require("../config/jwt");
 var crypto = require('crypto');
 
 exports.login = async (req, res) => {
+    console.log('회원 로그인 호출됨.');
     models.user
         .findOne({
             where: { user_id: req.body.user_id }
@@ -23,7 +24,7 @@ exports.login = async (req, res) => {
                     accessToken: await util.generateAccessToken(req, res),
                     refreshToken: await util.generateRefreshToken(req, res)
                 }
-                console.log('토큰 생성됨.');
+                console.log('토큰 생성됨.\n');
                 res.cookie('accessToken', tokens.accessToken, {
                     expires: new Date(Date.now() + tokens.accessToken.expiresIn),
                     secure: true,
@@ -40,7 +41,7 @@ exports.login = async (req, res) => {
             else {
                 console.log('비밀번호 불일치. 로그인 실패.');
                 res.status(409);
-                res.json(util.successFalse(null, '패스워드 불일치. 로그인 실패.'));
+                res.json(util.successFalse(null, '비밀번호 불일치. 로그인 실패.'));
             }
         }).catch(async err => {
             console.log('ID가 존재하지 않음. 로그인 실패.');
@@ -75,6 +76,7 @@ exports.login = async (req, res) => {
 // };
 
 exports.refresh = (req, res) => {
+    console.log('액세스 토큰 재발급 호출됨.');
     var refreshToken = req.headers['x-refresh-token'];
     jwt.verify(refreshToken, jwtConfig.refreshTokenSecret, function (err, decoded) {
         if (err) return res.status(401).json(util.successFalse(err)); // refresh token이 만료됐을때
@@ -123,8 +125,9 @@ exports.checkId = (req, res) => { // 만약 아이디를 쓰지 않는다면?
             }
             else {
                 res.status(200);
-                res.json(util.successTrue(null));
+                res.json(util.successTrue());
             }
+            console.log('ID 중복 검사 성공.\n');
         }).catch(err => {
             console.log('DB에서 ID 조회 실패');
             console.dir(err);
@@ -146,8 +149,9 @@ exports.checkNickname = (req, res) => {
             }
             else {
                 res.status(200);
-                res.json(util.successTrue(null));
+                res.json(util.successTrue());
             }
+            console.log('닉네임 중복 검사 성공.\n');
         }).catch(err => {
             console.log('DB에서 nickname 조회 실패');
             console.dir(err);
