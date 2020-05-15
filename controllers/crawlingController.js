@@ -87,6 +87,91 @@ exports.clien = (req, res) => {
     }
   })
 };
+exports.mallTail = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('몰테일 크롤링 호출됨.');
+  let page = req.params.pageNum;
+  mallTail(page, function (err, data) {
+    if (err) {
+      console.log('몰테일 크롤링 성공.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '몰테일 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('몰테일 크롤링 성공.\n');
+    }
+  })
+};
+
+const mallTail = async (pageNum, callback) => {
+  try {
+    link = "https://post.malltail.com/hotdeals/index/keyword:/page:" + pageNum
+    const response = await axios({
+      method: "GET",
+      url: link,
+      headers:
+      {
+
+        "accept": 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'ko- KR, ko; q = 0.9, en - US; q = 0.8, en; q = 0.7',
+        "Connection": 'keep-alive',
+        "Cookie": 'CHK_REFERER=http%3A%2F%2Fpost.malltail.com%2Fhotdeals%2Findex%2Fkeyword%3A%2Fpage%3A3; __utmz=77259412.1589469283.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); ____MSLOG__initkey=0.5961439518775975; __utma=77259412.1064403396.1589469283.1589469283.1589536951.2; __utmc=77259412; ____MSLOG__initday=20200515; CAKEPHP=795a7b9226761913feb77fb88e1204b8; __utmb=77259412.66.10.1589536951; wcs_bt=s_57708fe1a199:1589538335',
+        'Host': 'post.malltail.com',
+        'referer': link,
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+
+      }
+
+    });
+
+    if (response.status == 200) {
+      const html = response.data;
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("#container > div.hotdeal-wrap.event_area > table > tbody > tr").not('.notice')
+      p = 0
+      $bodyList.each(function (i, elem) {
+        j = i % 7
+        if (j !== 0 && j !== 1) {
+          ulList[p] = {
+
+            category: $(this).find('td:nth-child(1)').text().trim(),
+            title: $(this).find('td.title > a').text(),
+            Url: "https://post.malltail.com" + $(this).find('td.title > a').attr('href'),
+            replyCount: $(this).find(' td.title').text().split('(')[1].replace(/[^0-9]/g, ''),
+            hit: $(this).find('td:nth-child(5)').text().trim(),
+            time: $(this).find('td:nth-child(7)').text().trim(),
+
+          };
+          if (ulList[p].time.match('-')) {
+            ulList[p].time = ulList[p].time.replace(/-/g, '/').slice(2, 10)
+          }
+          else if (ulList[p].time.match(':')) {
+            ulList[p].time = ulList[p].time.slice(0, 5)
+          }
+          p = p + 1
+        }
+      });
+
+      const data = ulList;
+      console.log(data);
+      callback(null, data)
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 exports.coolEnjoy = (req, res) => {
   console.log("검색 요청 시간 : ", date);
