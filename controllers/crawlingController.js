@@ -69,6 +69,84 @@ exports.fmHotdeal = (req, res) => {
   })
 };
 
+exports.clienHotdeal = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('클리앙 알뜰구매 크롤링 호출됨.');
+  let page = req.params.pageNum;
+  clienHotdeal(page, function (err, data) {
+    if (err) {
+      console.log('클리앙 알뜰구매 크롤링 성공.');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '클리앙 알뜰구매 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('클리앙 알뜰구매 크롤링 성공.\n');
+    }
+  })
+};
+const clienHotdeal = async (pageNum, callback) => {
+  try {
+    link = "https://www.clien.net/service/board/jirum?&od=T31&po=" + (pageNum - 1)
+    const response = await axios({
+      method: "GET",
+      url: link,
+      headers:
+      {
+        "scheme": 'https',
+        "accept": 'application / json, text/ javascript */*; q=0.01',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'ko- KR, ko; q = 0.9, en - US; q = 0.8, en; q = 0.7',
+        "Connection": 'keep-alive',
+        "Cookie": 'SESSION=2aa1770f-d213-42d4-9993-280d008bca90; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.896276763.1589517326',
+        'Host': 'www.clien.net',
+        'referer': link,
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+
+    });
+
+    if (response.status == 200) {
+      const html = response.data;
+      let ulList = [];
+      const $ = cheerio.load(html);
+      const $bodyList = $("#div_content > div.list_content > div > div").not('div.list_item blocked')
+
+      $bodyList.each(function (i, elem) {
+        ulList[i] = {
+
+          category: $(this).find('div.list_title > div > a').text().trim(),
+          title: $(this).find('div.list_title > span > a').text().trim().replace(/\t/g, '').split('\n')[0],
+          Url: "https://www.clien.net" + $(this).find('div.list_title > span > a').attr('href'),
+          replyCount: $(this).find('div.list_title > span > a.list_reply.reply_symph > span').text().trim(),
+          hit: $(this).find('div.list_hit > span').text().trim(),
+          time: $(this).find('div.list_time > span').text().trim().slice(0, 5),
+
+        };
+        if (ulList[i].hit.match('k')) {
+          ulList[i].hit = ulList[i].hit.replace(/ k/g, '000').replace(/\./g, '')
+        }
+        if (ulList[i].time.match('-')) {
+          ulList[i].time = $(this).find('div.list_time > span').text().trim().slice(7, 9) + '/' + ulList[i].time.replace(/-/g, '/')
+        }
+      });
+
+      const data = ulList;
+      console.log(data);
+      callback(null, data)
+
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const fmHotdeal = async (pageNum, callback) => {
   try {
     link = "https://www.fmkorea.com/index.php?mid=hotdeal&listStyle=list&page=" + pageNum
