@@ -259,19 +259,19 @@ const clien = async (pageNum, callback) => {
       url: link,
       headers:
       {
-        "scheme": 'https',
-        "accept": 'application / json, text/ javascript */*; q=0.01',
+        "accept": 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'ko- KR, ko; q = 0.9, en - US; q = 0.8, en; q = 0.7',
         "Connection": 'keep-alive',
-        "Cookie": 'SESSION=2aa1770f-d213-42d4-9993-280d008bca90; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.896276763.1589517326',
+        "Cookie": 'SESSION=016e338b-1425-4912-afa0-4744e4737b67; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.896276763.1589517326',
         'Host': 'www.clien.net',
-        'referer': link,
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
+        'referer': 'https://www.clien.net/service/board/jirum',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
         'sec-fetch-site': 'same-origin',
-        'user-agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
-        'X-Requested-With': 'XMLHttpRequest',
+        'sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
       }
 
     });
@@ -287,15 +287,15 @@ const clien = async (pageNum, callback) => {
 
           category: $(this).find('div.list_title > div > a').text().trim(),
           title: $(this).find('div.list_title > span > a').text().trim().replace(/\t/g, '').split('\n')[0],
-          Url: "https://www.clien.net" + $(this).find('div.list_title > span > a').attr('href'),
+          Url: ("https://www.clien.net" + $(this).find('div.list_title > span > a').attr('href')).split('\?')[0],
           replyCount: $(this).find('div.list_title > span > a.list_reply.reply_symph > span').text().trim(),
           hit: $(this).find('div.list_hit > span').text().trim(),
           time: $(this).find('div.list_time > span').text().trim().slice(0, 5),
 
         };
-        if (ulList[i].hit.match('k')) {
-          ulList[i].hit = ulList[i].hit.replace(/ k/g, '000').replace(/\./g, '')
-        }
+        // if (ulList[i].hit.match('k')) {
+        //   ulList[i].hit = ulList[i].hit.replace(/ k/g, '000').replace(/\./g, '')
+        // }
         if (ulList[i].time.match('-')) {
           ulList[i].time = $(this).find('div.list_time > span').text().trim().slice(7, 9) + '/' + ulList[i].time.replace(/-/g, '/')
         }
