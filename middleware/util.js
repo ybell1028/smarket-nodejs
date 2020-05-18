@@ -94,7 +94,7 @@ util.isLoggedin = function (req, res, next) {
             if (err) return res.status(401).json(util.successFalse(err));
             else {
                 console.dir(decoded);
-                console.log('인증됨.')
+                console.log('JWT 인증됨.')
                 req.body.user_id = decoded.user_id;
                 next();
             }

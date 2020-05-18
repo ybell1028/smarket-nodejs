@@ -39,7 +39,6 @@ exports.userRegister = (req, res) => {
         })
         .then(function (data) {
             console.log('계정 데이터 삽입됨.');
-            console.dir(data);
             res.status(201);
             res.json(util.successTrue(data));
         })

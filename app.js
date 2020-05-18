@@ -68,6 +68,7 @@ models.sequelize.sync().then(() => {
 // 싱글 스레드
 //"192.168.27.209"
 http.createServer(app).listen(app.get('port'), function () {
+    console.log('ip : localhost | ' + 'port : ' + app.get('port'));
     console.log('server is running');
 });
 

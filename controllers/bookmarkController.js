@@ -73,11 +73,14 @@ exports.bookmarkList = (req, res) => {
 };
 
 exports.bookmarkLprice = (req, res) => {
+    let promises = [];
+    let idString = req.body.id.substring(1, req.body.id.length - 1);
+    let idArray = idString.split(',');
     models.bookmark
         .findAll({
             attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
             where: {
-                id: req.body.id,
+                id: idArray,
                 user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
             }
         })
@@ -223,35 +226,8 @@ exports.bookmarkDelete = (req, res) => {
         });
 };
 
-
 let delay = function ( timeout ) {
     return new Promise(( resolve ) => {
        setTimeout( resolve, timeout );
     });
  }
-
-let isSelling = function (res, list, promises, id, foldername) {
-    for (let i = 0; i < list.length; i++) {
-        setTimeout(() => {
-            if (!list[i].dataValues.item_selling) {
-                list[i].dataValues.item_lprice = null;
-                list[i].dataValues.item_link = null;
-                list[i].dataValues.item_image = null;
-                promises.push(list[i]);
-                console.log(list[i].dataValues.item_title + "판매 종료.");
-            }
-            else {
-                promises.push(naverController.checkItem(list[i]));
-            }
-            if (promises.length == list.length) {
-                Promise.all(promises)
-                    .then(allCheckedList => {
-                        if(id === null) console.log('폴더 ' + foldername + ' 내 북마크 리스트 조회 완료.\n');
-                        else if(foldername === null) console.log('사용자 ' + id + '의 전체 북마크 리스트 조회 완료.\n')
-                        res.status(200);
-                        res.json(util.successTrue(allCheckedList));
-                    })
-            }
-        }, 120 * i)
-    }
-}

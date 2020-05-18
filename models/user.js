@@ -30,7 +30,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     salt: {
       type: DataTypes.STRING,
+      allowNull: false
     },
+    device_token:{
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
     underscored: true,
     freezeTableName: true, //모델에 대한 테이블명을 모델명 그대로 사용하도록 합니다.

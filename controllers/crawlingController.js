@@ -678,16 +678,16 @@ exports.itemDetail = (req, res) => {
   console.log('상품 상세 정보 조회 호출됨.');
 
   youtubeController.searchToTitle(req)
-    .then(async detailData => {
+    .then(detailData => {
       res.status(200);
       res.json(util.successTrue(detailData));
-      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 완료.\n');
+      console.log('북마크 상품 ' + req.query.query + ' 상세 정보 조회 완료.\n');
     })
     .catch(err => {
       console.dir(err);
-      console.log('북마크 상품' + req.query.query + ' 상세 정보 조회 실패.\n')
+      console.log('북마크 상품 ' + req.query.query + ' 상세 정보 조회 실패.\n')
       res.status(500);
-      res.json(util.successFalse(err, '북마크 상품' + req.query.query + ' 상세 정보 조회 실패.'));
+      res.json(util.successFalse(err, '북마크 상품 ' + req.query.query + ' 상세 정보 조회 실패.'));
     });
 }
 

@@ -9,6 +9,8 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
 
     let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?' + querystring.stringify(req.query);
 
+    console.log(querystring.stringify(req.query));
+
     let options = {
         url: naverUrl,
         headers: {
@@ -34,7 +36,7 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
 };
 
 exports.checkItem = (item) => new Promise((resolve, reject) => {
-    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title);
+    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title) + '&display=20';
     let options = {
         url: naverUrl,
         headers: {

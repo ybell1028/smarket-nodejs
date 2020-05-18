@@ -112,7 +112,7 @@ exports.refresh = (req, res) => {
 // }
 
 
-exports.checkId = (req, res) => { // 만약 아이디를 쓰지 않는다면?
+exports.checkId = (req, res) => {
     console.log('ID 중복 검사 호출됨.');
     models.user
         .findOne({
