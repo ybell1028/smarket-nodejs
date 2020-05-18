@@ -73,19 +73,22 @@ exports.bookmarkList = (req, res) => {
 };
 
 exports.bookmarkLprice = (req, res) => {
-    let ids = req.body.ids;
     let promises = [];
+    let idArray = [];
+    let idString = req.body.id.substring(1, req.body.id.length - 1);
+
+    console.log(idString);
+    
+
     models.bookmark
         .findAll({
             attributes: ['id', 'user_id', 'folder_name', 'item_id', 'item_title', 'item_type', 'item_selling'],
             where: {
-                id: ids,
+                id: req.body.id,
                 user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
             }
         })
         .then(list => {
-            // let ary = [];
-            // ary.push(data);
             isSelling(res, list, promises, null, null);
         })
         .catch(err => {

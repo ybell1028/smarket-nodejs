@@ -13,7 +13,7 @@ module.exports = {
                 allowNull: false
             },
             folder_name: {
-                type: Sequelize.STRING(150),
+                type: Sequelize.STRING,
                 allowNull: false
             },
             item_id: {
@@ -21,7 +21,7 @@ module.exports = {
                 allowNull: false
             },
             item_title: {
-                type: Sequelize.STRING(150),
+                type: Sequelize.STRING,
                 allowNull: false
             },
             item_type: {
