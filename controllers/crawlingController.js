@@ -674,6 +674,204 @@ const prodData = async (pcode, callback) => {
   }
 };
 
+exports.priceFlow = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('다나와 가격 추이 크롤링 호출됨.\n');
+  let period = querystring.stringify(req.query);
+  priceFlow(req.query.keyword, 3, function (err, data) {
+    if (err) {
+      console.log('다나와 가격 추이 크롤링 호출됨.\n');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '다나와 가격 추이 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('다나와 가격 추이 크롤링 성공.\n');
+    }
+  })
+};
+
+const priceFlow = (keyword, period, callback) => new Promise(async (resolve, reject) => {
+  try {
+    search = await danawaSearch(keyword)
+    link = `http://prod.danawa.com/info/ajax/getProductPriceList.ajax.php?productCode=${search.hidden}&period=${period}`
+    const response = await axios(
+      {
+        method: "GET",
+        url: link,
+        headers: {
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'AcceptEncoding': 'gzip, deflate',
+          'AcceptLanguage': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+          // 'Cache-Control': 'max-age=0',
+          'Connection': 'keep-alive',
+          'ContentLength': '316',
+          'ContentType': 'application/x-www-form-urlencoded',
+          'Cookie': 'ADWEBCOUNTER_UUID=03bd7cbf-77c5-209c-918c-f6fd954a64b0; danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; recentProductYN=Y; _gid=GA1.2.1105565467.1589469673; cookSaveShopInfo=EE128%3A2020-05-08%7CTP402%3A2020-05-15%7CTH201%3A2020-05-17; cookNewSearchKeyword=%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C%207%EC%84%B8%EB%8C%80%3E05.17%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.17%7Cqcy%20t5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%AA%E3%85%87%3E05.17%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.16%7Cqcy%20t5%20pro%3E05.16%7C%EB%8B%8C%ED%85%90%EB%8F%84%20%EC%8A%A4%EC%9C%84%EC%B9%98%3E05.16; PHPSESSID=08bsef6o0eepc3m2695ilbiov2; ADWEBCOUNTER_URL=; cookSaveProdInfo=12%3A10929630%3A439000%7C12%3A9492972%3A398000%7C10%3A11206107%3A26650%7C19%3A8706542%3A555930%7C11%3A5937666%3A32920%7C10%3A10893660%3A19420%7C10%3A10906536%3A15070%7C10%3A9959532%3A26580%7C10%3A9921900%3A18980%7C11%3A8080807%3A31500%7C18%3A4666038%3A12370%7C15%3A10409847%3A247000%7C12%3A10931013%3A475000%7C11%3A3274953%3A11810%7C15%3A4423224%3A345000; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|43160423994aa0f421184f56bbeed0a3_66798:1589768684000; wcs_bt=s_3b3fb74948b1:1589766884',
+          'Host': 'prod.danawa.com',
+          // 'Origin': 'http://search.danawa.com',
+          'Referer': 'http://prod.danawa.com/info/?pcode=10929630&keyword=%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8&cate=122577',
+          'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+          'XRequestedWith': 'XMLHttpRequest',
+        },
+        // enconding: 'utf-8'
+      }
+    );
+    console.log(response.status)
+    const html = await response.data;
+    let ulList = {
+      price: html
+    };
+    callback(null, ulList)
+
+  } catch (error) {
+    console.error(error);
+    reject(err)
+
+  }
+});
+exports.itemNews = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('다나와 뉴스 크롤링 호출됨.\n');
+  let period = querystring.stringify(req.query);
+  itemNews(req.query.keyword, function (err, data) {
+    if (err) {
+      console.log('다나와 뉴스 크롤링 호출됨.\n');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '다나와 뉴스 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('다나와 뉴스 크롤링 성공.\n');
+    }
+  })
+};
+const itemNews = (keyword, callback) => new Promise(async (resolve, reject) => {
+  try {
+    pagenum = 1
+    search = await danawaSearch(keyword)
+    link = `http://prod.danawa.com/info/dpg/ajax/newsRoom.ajax.php?&prodCode=${search.hidden}&page=1&limit=6`
+    referer = 'http://prod.danawa.com/info/?pcode=' + search.hidden
+    const response = await axios(
+      {
+        method: "GET",
+        url: link,
+        headers: {
+          'Accept': '*/*',
+          'AcceptEncoding': 'gzip, deflate',
+          'AcceptLanguage': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+          'Connection': 'keep-alive',
+          'ContentLength': '316',
+          'ContentType': 'application/x-www-form-urlencoded;charset=UTF-8',
+          'Cookie': 'ADWEBCOUNTER_UUID=03bd7cbf-77c5-209c-918c-f6fd954a64b0; danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; recentProductYN=Y; _gid=GA1.2.1105565467.1589469673; cookSaveShopInfo=EE128%3A2020-05-08%7CTP402%3A2020-05-15%7CTH201%3A2020-05-17; cookNewSearchKeyword=%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C%207%EC%84%B8%EB%8C%80%3E05.17%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.17%7Cqcy%20t5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%AA%E3%85%87%3E05.17%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.16%7Cqcy%20t5%20pro%3E05.16%7C%EB%8B%8C%ED%85%90%EB%8F%84%20%EC%8A%A4%EC%9C%84%EC%B9%98%3E05.16; PHPSESSID=08bsef6o0eepc3m2695ilbiov2; ADWEBCOUNTER_URL=; cookSaveProdInfo=12%3A10929630%3A439000%7C12%3A9492972%3A398000%7C10%3A11206107%3A26650%7C19%3A8706542%3A555930%7C11%3A5937666%3A32920%7C10%3A10893660%3A19420%7C10%3A10906536%3A15070%7C10%3A9959532%3A26580%7C10%3A9921900%3A18980%7C11%3A8080807%3A31500%7C18%3A4666038%3A12370%7C15%3A10409847%3A247000%7C12%3A10931013%3A475000%7C11%3A3274953%3A11810%7C15%3A4423224%3A345000; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|43160423994aa0f421184f56bbeed0a3_66798:1589768684000; wcs_bt=s_3b3fb74948b1:1589766884',
+          'Host': 'prod.danawa.com',
+          'Referer': referer,
+          'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        },
+      }
+    );
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+    console.log(response.status)
+    let ulList = [];
+    const $bodyList = $("[class ='thmb_con']")
+    if (response.status == 200) {
+      $bodyList.each(function (i, elem) {
+        ulList[i] = {
+          img: $(this).find('img').attr('src'),
+          title: $(this).find('div a span').text().trim().replace(/\t|\n/g, ""),
+          url: 'http://dpg.danawa.com/news/movieDetail?listSeq=' + $(this).find('a').attr('id').replace(/[^0-9]/g, ''),
+          user: $(this).find('div > div > div > div').text().replace(/\t|\n/g, ''),
+          hit: $(this).find('span.view > em').text(),
+          date: $(this).find('span.date').text().slice(2, 10).replace(/\./g, '/')
+        };
+      });
+      data = ulList
+      callback(null, data)
+    }
+
+  } catch (error) {
+    console.error(error);
+    reject(err)
+  }
+});
+exports.reView = (req, res) => {
+  console.log("검색 요청 시간 : ", date);
+  console.log('다나와 사용자 리뷰 크롤링 호출됨.\n');
+  let period = querystring.stringify(req.query);
+  reView(req.query.keyword, req.query.reviewcount, function (err, data) {
+    if (err) {
+      console.log('다나와 사용자 리뷰 크롤링 호출됨.\n');
+      console.dir(err);
+      res.status(409);
+      res.json(util.successFalse(err, '다나와 사용자 리뷰 크롤링 에러.'));
+
+    } else {
+      res.status(200);
+      res.json(util.successTrue(data));
+      console.log('다나와 사용자 리뷰 크롤링 성공.\n');
+    }
+  })
+};
+const reView = async (keyword, reviewcount, callback) => {
+  try {
+    search = await danawaSearch(keyword)
+    link = `http://prod.danawa.com/info/dpg/ajax/companyProductReview.ajax.php?t=0.38440935379219865&prodCode=${search.hidden}&cate1Code=${search.cate[0]}&page=1&limit=${reviewcount}&score=0&sortType=&usefullScore=Y&innerKeyword=&subjectWord=0&subjectWordString=&subjectSimilarWordString=`
+
+    referer = "http://prod.danawa.com/info/?pcode=10931007&relationMenuType=recommend"
+
+    const response = await axios(
+      {
+
+        method: "GET",
+        url: link,
+        headers: {
+          'Accept': ' */*',
+          'AcceptEncoding': 'gzip, deflate',
+          'AcceptLanguage': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+          'Connection': 'keep-alive',
+          'ContentType': 'application/x-www-form-urlencoded;charset=UTF-8',
+          'Cookie': 'ADWEBCOUNTER_UUID=03bd7cbf-77c5-209c-918c-f6fd954a64b0; danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; recentProductYN=Y; _gid=GA1.2.1105565467.1589469673; cookSaveShopInfo=EE128%3A2020-05-08%7CTP402%3A2020-05-15%7CTH201%3A2020-05-17; cookNewSearchKeyword=%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C%207%EC%84%B8%EB%8C%80%3E05.17%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.17%7Cqcy%20t5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%AA%E3%85%87%3E05.17%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.16%7Cqcy%20t5%20pro%3E05.16%7C%EB%8B%8C%ED%85%90%EB%8F%84%20%EC%8A%A4%EC%9C%84%EC%B9%98%3E05.16; PHPSESSID=08bsef6o0eepc3m2695ilbiov2; ADWEBCOUNTER_URL=; cookSaveProdInfo=12%3A10929630%3A439000%7C12%3A9492972%3A398000%7C10%3A11206107%3A26650%7C19%3A8706542%3A555930%7C11%3A5937666%3A32920%7C10%3A10893660%3A19420%7C10%3A10906536%3A15070%7C10%3A9959532%3A26580%7C10%3A9921900%3A18980%7C11%3A8080807%3A31500%7C18%3A4666038%3A12370%7C15%3A10409847%3A247000%7C12%3A10931013%3A475000%7C11%3A3274953%3A11810%7C15%3A4423224%3A345000; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|8cab0d22e52ee20ca1569d5f9e053538_81181:1589782997000; wcs_bt=s_3b3fb74948b1:1589781197; _gat=1',
+          'Host': 'prod.danawa.com',
+          // 'Referer': referer,
+          'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        },
+        // enconding: 'utf-8'
+      }
+    );
+
+    console.log(response.status)
+    const html = response.data;
+    let ulList = [];
+    const $ = cheerio.load(html);
+    const $bodyList = $("[class ='danawa-prodBlog-companyReview-clazz-more']")
+    if (response.status == 200) {
+      $bodyList.each(function (i, elem) {
+        ulList[i] = {
+          title: ($(this).find('div.tit_W > p').text().trim(), $(this).find('div.tit_W > p').text().trim()),
+          content: $(this).find('div.atc').text(),
+          user: $(this).find('span.name').text(),
+          score: $(this).find('span.point_type_s > span').text(),
+          mall: $(this).find('span.mall').text(),
+          date: $(this).find('span.date').text()
+        };
+
+      });
+      console.log(ulList)
+      callback(null, ulList)
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
 exports.itemDetail = (req, res) => {
   console.log('상품 상세 정보 조회 호출됨.');
 
