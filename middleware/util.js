@@ -12,6 +12,17 @@ util.successTrue = function (data) {
     };
 };
 
+util.successTrueDetail = function (spec, review, news, youtube) {
+    return {
+        success: true,
+        timestamp: new Date(Date.now()),
+        spec: spec,
+        review: review,
+        news: news,
+        youtube: youtube
+    };
+};
+
 util.successFalse = function (err, comment) {
     if (!err && !comment) comment = 'data not found';
 

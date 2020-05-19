@@ -35,36 +35,35 @@ exports.search = (req, res) => {
     });
 }
 
+// exports.searchToTitle = (req) => new Promise((resolve, reject) => {
+//     var options = {
+//         q: req.query.query,
+//         part: "snippet",
+//         key: YOUTUBE_API_KEY,
+//         type: "video",
+//         // maxResults: req.query.maxResults,
+//         regionCode: "KR"
+//     };
 
-exports.searchToTitle = (req) => new Promise((resolve, reject) => {
-    var options = {
-        q: req.query.query,
-        part: "snippet",
-        key: YOUTUBE_API_KEY,
-        type: "video",
-        // maxResults: req.query.maxResults,
-        regionCode: "KR"
-    };
+//     var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
 
-    var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
+//     request.get(youtubeUrl, async function (err, response, body) {
+//         if (!err && response.statusCode == 200) {
+//             let searchResult = [];
+//             let spec = await crawlingController.itemSpec(req.query.query);
+//             searchResult.push(spec[0]);
+//             for (let i = 0; i < JSON.parse(body).items.length; i++) {
+//                 searchResult.push(JSON.parse(body).items[i]);
+//             }
 
-    request.get(youtubeUrl, async function (err, response, body) {
-        if (!err && response.statusCode == 200) {
-            let searchResult = [];
-            let spec = await crawlingController.itemSpec(req.query.query);
-            searchResult.push(spec[0]);
-            for (let i = 0; i < JSON.parse(body).items.length; i++) {
-                searchResult.push(JSON.parse(body).items[i]);
-            }
+//             console.log('유튜브 API 검색 성공');
 
-            console.log('유튜브 API 검색 성공');
-
-            resolve(searchResult);
-        }
-        else {
-            console.dir(err);
-            console.log('유튜브 API 검색 실패');
-            reject(err);
-        }
-    });
-});
+//             resolve(searchResult);
+//         }
+//         else {
+//             console.dir(err);
+//             console.log('유튜브 API 검색 실패');
+//             reject(err);
+//         }
+//     });
+// });

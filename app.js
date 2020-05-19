@@ -1,10 +1,12 @@
 const express = require('express');
 const http = require('http');
+const socket = require('socket.io');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cluster = module.exports = require('cluster');
 cluster.schedulingPolicy = cluster.SCHED_RR;
 const cors = require('cors');
+const numCPUs = require('os').cpus().length;
 const util = require('./middleware/util');
 
 /*라우터*/
@@ -14,7 +16,7 @@ const api = require('./routes/api');
 const app = express();
 
 //environment
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8080);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -39,6 +41,10 @@ models.sequelize.sync().then(() => {
     console.log(err);
 });
 
+let server = http.createServer(app);
+
+// let ip = '192.168.0.2'; 
+
 // 멀티 스레드
 /* cluster(multithread) setting */
 
@@ -59,16 +65,21 @@ models.sequelize.sync().then(() => {
 //     });
 
 // } else {
-//     http.createServer(app).listen(app.get('port'), function () {
-//         console.log('slave server '+cluster.worker.process.pid);
+//     server.listen(app.get('port'), ip, function () {
+//         console.log('slave server '+ cluster.worker.process.pid);
 //     });
+//     console.log('ip : ' + ip + ' | port : ' + app.get('port'));
+//     console.log('server is running');
 // }
 
 
 // 싱글 스레드
-//"192.168.27.209"
-http.createServer(app).listen(app.get('port'), function () {
-    console.log('ip : localhost | ' + 'port : ' + app.get('port'));
+
+server.listen(app.get('port'), function () {
+    // console.log('ip : ' + ip + ' | port : ' + app.get('port'));
     console.log('server is running');
 });
 
+server.on('connection', function(socket){
+    console.log('클라이언트가 접속했습니다.');
+});

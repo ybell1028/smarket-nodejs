@@ -10,15 +10,13 @@ admin.initializeApp({
 
 exports.sendMessage = (req, res) => {
 
-  let deviceToken = req.headers['x-device-token'];
-
   // 보낼 메시지를 작성하는 부분 입니다.
   let message = {
     data: {
       title: req.body.pushtitle,
       body: req.body.pushbody
     },
-    token: deviceToken
+    token: req.headers['x-device-token']
   };
   
   admin.messaging().send(message)
@@ -44,9 +42,8 @@ exports.receiveToken = (req, res) => {
       where: {user_id : req.body.user_id}
     })
     .then(data => {
-      console.log(req.body.device_token);
-      if(data.dataValues.device_token != req.body.device_token){
-        let updateNum = updateToken(data.dataValues.user_id, req.body.device_token);
+      if(data.dataValues.device_token != req.headers['x-device-token']){
+        let updateNum = updateToken(data.dataValues.user_id, req.headers['x-device-token']);
         console.log('디바이스 토큰 업데이트 성공.\n');
         res.status(201);
         res.json(util.successTrue(updateNum));
@@ -66,8 +63,6 @@ exports.receiveToken = (req, res) => {
 }
 
 let updateToken = (id, token) => {
-  console.log(id);
-  console.log(token);
   models.user
     .update({
       device_token: token

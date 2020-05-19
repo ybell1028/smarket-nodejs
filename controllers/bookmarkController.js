@@ -95,6 +95,7 @@ exports.bookmarkLprice = (req, res) => {
         });
 }
 
+
 let isSelling = function (res, list, promises, id, foldername) {
     console.log(list.length);
     for (let i = 0; i < list.length; i++) {
