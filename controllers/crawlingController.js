@@ -785,7 +785,7 @@ const itemNews = (keyword, callback) => new Promise(async (resolve, reject) => {
         ulList[i] = {
           img: $(this).find('img').attr('src'),
           title: $(this).find('div a span').text().trim().replace(/\t|\n/g, ""),
-          url: 'http://dpg.danawa.com/news/movieDetail?listSeq=' + $(this).find('a').attr('id').replace(/[^0-9]/g, ''),
+          url: 'http://dpg.danawa.com/news/view?boardSeq=' + $(this).find('a').attr('data-board') + '&listSeq=' + $(this).find('a').attr('id').replace(/[^0-9]/g, ''),
           user: $(this).find('div > div > div > div').text().replace(/\t|\n/g, ''),
           hit: $(this).find('span.view > em').text(),
           date: $(this).find('span.date').text().slice(2, 10).replace(/\./g, '/')
