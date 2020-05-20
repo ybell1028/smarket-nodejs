@@ -67,18 +67,18 @@ const itemSpec = (search) => new Promise(async (resolve, reject) => {
                 url: link,
                 data: formdata,
                 headers: {
-                    // 'Accept': 'text/html, */*; q=0.01',
-                    // 'AcceptEncoding': 'gzip, deflate',
-                    // 'AcceptLanguage': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                    // 'Connection': 'keep-alive',
+                    'Accept': 'text/html, */*; q=0.01',
+                    'AcceptEncoding': 'gzip, deflate',
+                    'AcceptLanguage': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'Connection': 'keep-alive',
                     // 'ContentLength': '533',
-                    // 'ContentType': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    // 'Cookie': 'danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_UUID=abd22176-5744-20e2-9b38-1daa02caab9a; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; ADWEBCOUNTER_URL=google.com; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; DPG_MOBILE_ARTICLE_MOVE_GUIDE=false; cookSaveShopInfo=EE128%3A2020-05-08; recentProductYN=Y; cookSaveProdInfo=12%3A10931007%3A495000%7C11%3A5937666%3A33300%7C11%3A4678115%3A42000%7C11%3A7342828%3A169500%7C18%3A8733146%3A77430%7C12%3A10234701%3A866100%7C12%3A8946266%3A754940%7C11%3A6160126%3A92720%7C12%3A9492972%3A435000%7C17%3A10515417%3A25000%7C19%3A7419571%3A8900%7C11%3A8100778%3A32900%7C12%3A6470540%3A145000%7C16%3A10590585%3A40920%7C12%3A6468060%3A30000; _gid=GA1.2.1214192827.1589157765; cookieGuestId=e41434714c4597a6bd319affc921b38a; cookNewSearchKeyword=%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.11%7CDDR4-2666%3E05.04%7C%EB%B3%B5%ED%95%A9%EA%B8%B0%3E04.26%7C%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C2%20%EC%A4%91%EA%B3%A0%EA%B0%80%EA%B2%A9%3E04.24%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS5e%2010.5%20LTE%20128G%3E04.20%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS5e%2010.5%2064G%3E04.20%7C%ED%8C%85%EB%A7%A4%EC%B9%984%ED%98%B8%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%20%EA%B2%BD%EB%9F%89%EC%B6%95%EA%B5%AC%EA%B3%B5%2011%EC%84%B8%EC%9D%B4%ED%95%98%20%EC%95%84%EB%8F%99%EC%9A%A9%EC%B6%95%EA%B5%AC%EA%B3%B5%3E04.20%7C%EC%8A%A4%ED%83%80%EC%8A%A4%ED%8F%AC%EC%B8%A0%20%EB%AA%AC%ED%83%80%EB%82%98%205%ED%98%B8%20%EC%B6%95%EA%B5%AC%EA%B3%B5%20SB895%3E04.20%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EC%82%BC%EC%84%B1%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%2010.5%20WiFi%20128G%3E04.20%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%3E04.20; cPreviousKeyword=%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|2646020e3363a1be76dcf97ad38a5d15_75222:1589177022000; wcs_bt=s_3b3fb74948b1:1589175222',
-                    // 'Host': 'prod.danawa.com',
-                    // 'Origin': 'http://prod.danawa.com',
+                    'ContentType': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'Cookie': 'danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_UUID=abd22176-5744-20e2-9b38-1daa02caab9a; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; ADWEBCOUNTER_URL=google.com; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; DPG_MOBILE_ARTICLE_MOVE_GUIDE=false; cookSaveShopInfo=EE128%3A2020-05-08; recentProductYN=Y; cookSaveProdInfo=12%3A10931007%3A495000%7C11%3A5937666%3A33300%7C11%3A4678115%3A42000%7C11%3A7342828%3A169500%7C18%3A8733146%3A77430%7C12%3A10234701%3A866100%7C12%3A8946266%3A754940%7C11%3A6160126%3A92720%7C12%3A9492972%3A435000%7C17%3A10515417%3A25000%7C19%3A7419571%3A8900%7C11%3A8100778%3A32900%7C12%3A6470540%3A145000%7C16%3A10590585%3A40920%7C12%3A6468060%3A30000; _gid=GA1.2.1214192827.1589157765; cookieGuestId=e41434714c4597a6bd319affc921b38a; cookNewSearchKeyword=%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.11%7CDDR4-2666%3E05.04%7C%EB%B3%B5%ED%95%A9%EA%B8%B0%3E04.26%7C%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C2%20%EC%A4%91%EA%B3%A0%EA%B0%80%EA%B2%A9%3E04.24%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS5e%2010.5%20LTE%20128G%3E04.20%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS5e%2010.5%2064G%3E04.20%7C%ED%8C%85%EB%A7%A4%EC%B9%984%ED%98%B8%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%20%EA%B2%BD%EB%9F%89%EC%B6%95%EA%B5%AC%EA%B3%B5%2011%EC%84%B8%EC%9D%B4%ED%95%98%20%EC%95%84%EB%8F%99%EC%9A%A9%EC%B6%95%EA%B5%AC%EA%B3%B5%3E04.20%7C%EC%8A%A4%ED%83%80%EC%8A%A4%ED%8F%AC%EC%B8%A0%20%EB%AA%AC%ED%83%80%EB%82%98%205%ED%98%B8%20%EC%B6%95%EA%B5%AC%EA%B3%B5%20SB895%3E04.20%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EC%82%BC%EC%84%B1%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%2010.5%20WiFi%20128G%3E04.20%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%3E04.20; cPreviousKeyword=%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|2646020e3363a1be76dcf97ad38a5d15_75222:1589177022000; wcs_bt=s_3b3fb74948b1:1589175222',
+                    'Host': 'prod.danawa.com',
+                    'Origin': 'http://prod.danawa.com',
                     'Referer': `http://prod.danawa.com/info/?pcode=${formdata.pcode}`,
-                    // 'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
-                    // 'XRequestedWith': 'XMLHttpRequest',
+                    'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+                    'XRequestedWith': 'XMLHttpRequest',
                 },
                 // enconding: 'utf-8'
             }
@@ -130,7 +130,7 @@ const itemReview = (search, reviewcount) => new Promise(async (resolve, reject) 
     try {
         link = `http://prod.danawa.com/info/dpg/ajax/companyProductReview.ajax.php?t=0.38440935379219865&prodCode=${search.hidden}&cate1Code=${search.cate[0]}&page=1&limit=${reviewcount}&score=0&sortType=&usefullScore=Y&innerKeyword=&subjectWord=0&subjectWordString=&subjectSimilarWordString=`
 
-        referer = "http://prod.danawa.com/info/?pcode=10931007&relationMenuType=recommend"
+        referer = `http://prod.danawa.com/info/?pcode=${search.hidden}`
 
         const response = await axios(
             {
@@ -145,7 +145,7 @@ const itemReview = (search, reviewcount) => new Promise(async (resolve, reject) 
                     'ContentType': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'Cookie': 'ADWEBCOUNTER_UUID=03bd7cbf-77c5-209c-918c-f6fd954a64b0; danawa-loggingApplicationClient=0e2b04cf-e9aa-4460-881a-3136dbba27f5; _ga=GA1.2.208717042.1583803510; ADWEBCOUNTER_KEYWORD=; OAX=r3y8fF6W9WwAAGIN; _INSIGHT_CK_8204=2d19ec171f979094b13c13185ef31a6b_47312|11792e1c8fbe00a6335e13185ef31a6b_47313:1588149114000; recentProductYN=Y; _gid=GA1.2.1105565467.1589469673; cookSaveShopInfo=EE128%3A2020-05-08%7CTP402%3A2020-05-15%7CTH201%3A2020-05-17; cookNewSearchKeyword=%EC%95%84%EC%9D%B4%ED%8C%A8%EB%93%9C%207%EC%84%B8%EB%8C%80%3E05.17%7C%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADs6%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.17%7Cqcy%20t5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%94%EC%9E%A5%3E05.17%7C%ED%83%9C%EC%96%91%EC%B4%88%20%EA%B3%A0%EC%B6%AA%E3%85%87%3E05.17%7C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90%20%EA%B0%A4%EB%9F%AD%EC%8B%9C%ED%83%ADS6%20%EB%9D%BC%EC%9D%B4%ED%8A%B8%3E05.16%7Cqcy%20t5%20pro%3E05.16%7C%EB%8B%8C%ED%85%90%EB%8F%84%20%EC%8A%A4%EC%9C%84%EC%B9%98%3E05.16; PHPSESSID=08bsef6o0eepc3m2695ilbiov2; ADWEBCOUNTER_URL=; cookSaveProdInfo=12%3A10929630%3A439000%7C12%3A9492972%3A398000%7C10%3A11206107%3A26650%7C19%3A8706542%3A555930%7C11%3A5937666%3A32920%7C10%3A10893660%3A19420%7C10%3A10906536%3A15070%7C10%3A9959532%3A26580%7C10%3A9921900%3A18980%7C11%3A8080807%3A31500%7C18%3A4666038%3A12370%7C15%3A10409847%3A247000%7C12%3A10931013%3A475000%7C11%3A3274953%3A11810%7C15%3A4423224%3A345000; _INSIGHT_CK_8203=dbd08b20fb13b1d7f25fbd4e26cddbe1_03510|8cab0d22e52ee20ca1569d5f9e053538_81181:1589782997000; wcs_bt=s_3b3fb74948b1:1589781197; _gat=1',
                     'Host': 'prod.danawa.com',
-                    // 'Referer': referer,
+                    'Referer': referer,
                     'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
                 },
                 // enconding: 'utf-8'
@@ -302,7 +302,7 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
         const html = response.data;
         let ulList = [];
         const $ = cheerio.load(html);
-        const $bodyList = $(".prod_item")
+        const $bodyList = $("div.main_prodlist.main_prodlist_list > ul > li")
         if (response.status == 200) {
             $bodyList.each(function (i, elem) {
                 ulList[i] = {
