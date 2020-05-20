@@ -16,7 +16,7 @@ const api = require('./routes/api');
 const app = express();
 
 //environment
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 3000);
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -80,6 +80,6 @@ server.listen(app.get('port'), function () {
     console.log('server is running');
 });
 
-server.on('connection', function(socket){
+server.on('connection', function (socket) {
     console.log('클라이언트가 접속했습니다.');
 });

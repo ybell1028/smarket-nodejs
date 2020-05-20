@@ -22,16 +22,16 @@ exports.itemDetail = async (req, res) => {
     promises.push(await itemNews(search));
     // promises.push(await itemYoutube(req.query.query));
     Promise.all(promises)
-    .then(result => {
-        console.log('상품 상세 정보 조회 성공.\n');
-        res.status(200);
-        res.json(util.successTrueDetail(result[0], result[1], result[2], null));
-    })
-    .catch(err => {
-        console.log('상품 상세 정보 조회 성공.\n');
-        res.status(403);
-        res.json(util.successFalse(err, '상품 상세 정보 조회 성공.'));
-    })
+        .then(result => {
+            console.log('상품 상세 정보 조회 성공.\n');
+            res.status(200);
+            res.json(util.successTrueDetail(result[0], result[1], result[2], null));
+        })
+        .catch(err => {
+            console.log('상품 상세 정보 조회 성공.\n');
+            res.status(403);
+            res.json(util.successFalse(err, '상품 상세 정보 조회 성공.'));
+        })
 }
 
 
@@ -39,6 +39,7 @@ const itemSpec = (search) => new Promise(async (resolve, reject) => {
     //Promise OK.
     try {
         inFo = await prodData(search.hidden)
+        console.log(search.hidden)
         formdata = querystring.stringify(
             {
                 pcode: search.hidden,
@@ -125,7 +126,7 @@ const itemSpec = (search) => new Promise(async (resolve, reject) => {
 });
 
 
-const itemReview =(search, reviewcount) => new Promise(async (resolve, reject) =>{
+const itemReview = (search, reviewcount) => new Promise(async (resolve, reject) => {
     try {
         link = `http://prod.danawa.com/info/dpg/ajax/companyProductReview.ajax.php?t=0.38440935379219865&prodCode=${search.hidden}&cate1Code=${search.cate[0]}&page=1&limit=${reviewcount}&score=0&sortType=&usefullScore=Y&innerKeyword=&subjectWord=0&subjectWordString=&subjectSimilarWordString=`
 
@@ -301,7 +302,7 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
         const html = response.data;
         let ulList = [];
         const $ = cheerio.load(html);
-        const $bodyList = $("[class$='prod_item ']")
+        const $bodyList = $(".prod_item")
         if (response.status == 200) {
             $bodyList.each(function (i, elem) {
                 ulList[i] = {
@@ -326,7 +327,7 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
 });
 
 
-const prodData = (pcode) => new Promise(async(resolve, reject) => {
+const prodData = (pcode) => new Promise(async (resolve, reject) => {
     try {
 
         link = "http://prod.danawa.com/info/?pcode=" + pcode
