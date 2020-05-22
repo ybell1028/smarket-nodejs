@@ -266,7 +266,7 @@ const clien = async (pageNum, callback) => {
         'Cache-Control': 'max-age=0',
         "Connection": 'keep-alive',
         'Host': 'www.clien.net',
-        'Cookie': 'SESSION=a99d34dd-dc2c-4f4f-8b64-052f21a687be; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.1172848127.1589862768; _gat_gtag_UA_682411_1=1',
+        // 'Cookie': 'SESSION=a99d34dd-dc2c-4f4f-8b64-052f21a687be; SCOUTER=x5evhpumo7oqih; _ga=GA1.2.860498838.1587006483; _gid=GA1.2.1172848127.1589862768; _gat_gtag_UA_682411_1=1',
         'referer': 'https://www.clien.net/service/board/jirum',
         'sec-fetch-dest': 'document',
         'sec-fetch-mode': 'navigate',
@@ -282,7 +282,7 @@ const clien = async (pageNum, callback) => {
       const html = response.data;
       let ulList = [];
       const $ = cheerio.load(html);
-      const $bodyList = $("#div_content > div.list_content > div > div").not('div.list_item blocked')
+      const $bodyList = $("#div_content > div.list_content > div.contents_jirum > div.list_item:not(.blocked)")
 
       $bodyList.each(function (i, elem) {
         ulList[i] = {
