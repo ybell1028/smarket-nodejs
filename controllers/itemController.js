@@ -17,9 +17,10 @@ exports.itemDetail = async (req, res) => {
     let promises = [];
     console.log('상품 상세 정보 조회 호출됨.');
     search = await danawaSearch(req.query.query);
-    promises.push(await itemSpec(search));
-    promises.push(await itemReview(search, req.query.reviewcount));
-    promises.push(await itemNews(search));
+    info = await prodData(search.hidden)
+    promises.push(await itemSpec(search, info));
+    promises.push(await itemReview(search, info, req.query.reviewcount));
+    promises.push(await itemNews(search, info));
     // promises.push(await itemYoutube(req.query.query));
     Promise.all(promises)
         .then(result => {
@@ -35,28 +36,26 @@ exports.itemDetail = async (req, res) => {
 }
 
 
-const itemSpec = (search) => new Promise(async (resolve, reject) => {
+const itemSpec = (search, info) => new Promise(async (resolve, reject) => {
     //Promise OK.
     try {
-        inFo = await prodData(search.hidden)
-        console.log(search.hidden)
         formdata = querystring.stringify(
             {
                 pcode: search.hidden,
-                cate1: search.cate[0],
-                cate2: search.cate[1],
-                cate3: search.cate[2],
-                cate4: search.cate[3],
-                makerName: inFo.makerName, // 미완성
-                brandName: inFo.brandName, // 미완성
-                makerUrl: inFo.makerUrl, // 미완성
-                kccode: inFo.kccode,  // 미완성
-                kpscode: inFo.kpscode,  // 미완성
-                circulName: inFo.circulName,
-                circulUrl: inFo.circulUrl,
-                productName: inFo.productName,
-                prodType: inFo.prodType,
-                displayMakeDate: inFo.displayMakeDate,
+                cate1: info.cate.nCategoryCode1,
+                cate2: info.cate.nCategoryCode2,
+                cate3: info.cate.nCategoryCode3,
+                cate4: info.cate.nCategoryCode4,
+                makerName: info.productInfo.makerName, // 미완성
+                // brandName: inFo.prouctInfo.brandName, // 미완성
+                makerUrl: info.productInfo.makerUrl, // 미완성
+                kccode: info.productInfo.kccode,  // 미완성
+                kpscode: info.productInfo.kpscode,  // 미완성
+                circulName: info.productInfo.circulName,
+                circulUrl: info.productInfo.circulUrl,
+                productName: info.productInfo.productName,
+                prodType: info.productInfo.prodType,
+                displayMakeDate: info.productInfo.displayMakeDate,
                 productFullName: search.title
             }
         )
@@ -126,9 +125,9 @@ const itemSpec = (search) => new Promise(async (resolve, reject) => {
 });
 
 
-const itemReview = (search, reviewcount) => new Promise(async (resolve, reject) => {
+const itemReview = (search, info, reviewcount) => new Promise(async (resolve, reject) => {
     try {
-        link = `http://prod.danawa.com/info/dpg/ajax/companyProductReview.ajax.php?t=0.38440935379219865&prodCode=${search.hidden}&cate1Code=${search.cate[0]}&page=1&limit=${reviewcount}&score=0&sortType=&usefullScore=Y&innerKeyword=&subjectWord=0&subjectWordString=&subjectSimilarWordString=`
+        link = `http://prod.danawa.com/info/dpg/ajax/companyProductReview.ajax.php?t=0.38440935379219865&prodCode=${search.hidden}&cate1Code=${info.productInfo.nCategoryCode1}&page=1&limit=${reviewcount}&score=0&sortType=&usefullScore=Y&innerKeyword=&subjectWord=0&subjectWordString=&subjectSimilarWordString=`
 
         referer = `http://prod.danawa.com/info/?pcode=${search.hidden}`
 
@@ -309,9 +308,9 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
                     title: $(this).find('p.prod_name').text().trim().replace(/(\r\n\t|\n|\r\t)/g, ""),
                     intro: $(this).find('p.intro_text').text(),
                     spec: $(this).find('div.spec_list').text().replace(/(\t)/gm, ""),
-                    hidden: $(this).find('input').attr('id').slice(25),
+                    hidden: $(this).attr('id').replace(/[^0-9]/g, ''),
                     // hidden1: $(this).parent().find('li').attr('id').slice(11),
-                    cate: $(this).find('div.prod_pricelist ul').parent().attr('data-cate').split('|'),
+                    // cate: $(this).find('div.prod_pricelist ul').parent().attr('data-cate').split('|'),
                     date: $(this).find('dl.meta_item.mt_date dd').text()
                 };
             });
@@ -364,9 +363,24 @@ const prodData = (pcode) => new Promise(async (resolve, reject) => {
         if (scripts.length === 1) {
             const text = $(scripts[0]).html();
             const oProductDescriptionInfo = text.split('var oProductDescriptionInfo = ')[1].split('};')[0] + '}'
+            const oGlobalSetting = text.split('var oGlobalSetting = ')[1].split('};')[0].replace(/\t|\n/g, '') + '}'
+
             const productInfo = JSON.parse(oProductDescriptionInfo)
-            resolve(productInfo);
+            // const productInfo1 = JSON.parse(oGlobalSetting)
+            console.log(oProductDescriptionInfo)
+
+            console.log(productInfo)
+            // console.log(oProductDescriptionInfo)
+            console.log(oGlobalSetting)
+            var cate = eval("(" + oGlobalSetting + ")");
+            var last = {}
+            last.productInfo = productInfo
+            last.cate = cate
+
+
+            resolve(last);
         }
+
 
     } catch (err) {
         console.dir(err);
