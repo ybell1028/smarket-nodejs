@@ -17,22 +17,31 @@ exports.itemDetail = async (req, res) => {
     let promises = [];
     console.log('상품 상세 정보 조회 호출됨.');
     search = await danawaSearch(req.query.query);
-    info = await prodData(search.hidden)
-    promises.push(await itemSpec(search, info));
-    promises.push(await itemReview(search, info, req.query.reviewcount));
-    promises.push(await itemNews(search, info));
-    // promises.push(await itemYoutube(req.query.query));
-    Promise.all(promises)
-        .then(result => {
-            console.log('상품 상세 정보 조회 성공.\n');
-            res.status(200);
-            res.json(util.successTrueDetail(result[0], result[1], result[2], null));
-        })
-        .catch(err => {
-            console.log('상품 상세 정보 조회 성공.\n');
-            res.status(403);
-            res.json(util.successFalse(err, '상품 상세 정보 조회 성공.'));
-        })
+    if (search != undefined) {
+        info = await prodData(search.hidden)
+        promises.push(await itemSpec(search, info));
+        promises.push(await itemReview(search, info, req.query.reviewcount));
+        promises.push(await itemNews(search, info));
+        // promises.push(await itemYoutube(req.query.query));
+        Promise.all(promises)
+            .then(result => {
+                console.log('상품 상세 정보 조회 성공.\n');
+                res.status(200);
+                res.json(util.successTrueDetail(result[0], result[1], result[2], null));
+            })
+            .catch(err => {
+                console.log('상품 상세 정보 조회 실패.\n');
+                res.status(403);
+                res.json(util.successFalse(err, '상품 상세 정보 조회 실패.'));
+            })
+
+
+    }
+    else {
+        console.log('상품 상세 정보 조회 실패.\n');
+        res.status(200);
+        res.json('상품 상세 정보가 없습니다.')
+    }
 }
 
 
@@ -367,18 +376,17 @@ const prodData = (pcode) => new Promise(async (resolve, reject) => {
 
             const productInfo = JSON.parse(oProductDescriptionInfo)
             // const productInfo1 = JSON.parse(oGlobalSetting)
-            console.log(oProductDescriptionInfo)
-
-            console.log(productInfo)
             // console.log(oProductDescriptionInfo)
-            console.log(oGlobalSetting)
+            // console.log(productInfo)
+            // // console.log(oProductDescriptionInfo)
+            // console.log(oGlobalSetting)
             var cate = eval("(" + oGlobalSetting + ")");
-            var last = {}
-            last.productInfo = productInfo
-            last.cate = cate
+            var prodlist = {}
+            prodlist.productInfo = productInfo
+            prodlist.cate = cate
 
 
-            resolve(last);
+            resolve(prodlist);
         }
 
 
