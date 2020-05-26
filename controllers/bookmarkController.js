@@ -15,7 +15,6 @@ exports.bookmarkCreate = (req, res) => {
             //item_selling은 default 값이 true로 들어가기 때문에 JSON데이터 필요 없음
         })
         .then(data => {
-            console.dir(data);
             console.log('북마크 생성 성공.\n');
             res.status(201); // 201은 새로운 컨텐츠 만들기에 성공했을 때 사용. POST 메소드에 대한 응답으로 잘 어울림.
             res.json(util.successTrue(data));
@@ -43,7 +42,7 @@ exports.bookmarkList = (req, res) => {
                 }
             })
             .then(list => {
-                isSelling(res, list, promises, null, queryFoldername);
+                isSelling(res, list, promises, true, req.body.user_id, queryFoldername);
             })
             .catch(err => {
                 console.dir(err);
@@ -61,7 +60,7 @@ exports.bookmarkList = (req, res) => {
                 }
             })
             .then(list => { // 아직 만들지 않은 폴더라면 null값
-                isSelling(res, list, promises, req.body.user_id, null);
+                isSelling(res, list, promises, true, req.body.user_id, null);
             })
             .catch(err => {
                 console.dir(err);
@@ -85,7 +84,7 @@ exports.bookmarkLprice = (req, res) => {
             }
         })
         .then(list => {
-            isSelling(res, list, promises, null, null);
+            isSelling(res, list, promises, false, req.body.user_id, null);
         })
         .catch(err => {
             console.dir(err);
@@ -96,8 +95,7 @@ exports.bookmarkLprice = (req, res) => {
 }
 
 
-let isSelling = function (res, list, promises, id, foldername) {
-    console.log(list.length);
+let isSelling = function (res, list, promises, bookmark, id, foldername) {
     for (let i = 0; i < list.length; i++) {
         setTimeout(() => {
             if (!list[i].dataValues.item_selling) {
@@ -113,8 +111,12 @@ let isSelling = function (res, list, promises, id, foldername) {
             if (promises.length == list.length) {
                 Promise.all(promises)
                     .then(allCheckedList => {
-                        if(id === null) console.log('폴더 ' + foldername + ' 내 북마크 리스트 조회 완료.\n');
-                        else if(foldername === null) console.log('사용자 ' + id + '의 전체 북마크 리스트 조회 완료.\n')
+                        if(bookmark) {
+                            if(foldername === null)
+                                console.log('사용자 ' + id + '의 전체 북마크 리스트 조회 완료.\n')
+                            else
+                                console.log('사용자 ' + id + '의 폴더 ' + foldername + ' 내 북마크 리스트 조회 완료.\n');
+                        }
                         else console.log(('사용자 ' + id + '의 최저가 정보 조회 완료.\n'))
                         res.status(200);
                         res.json(util.successTrue(allCheckedList));
@@ -139,7 +141,6 @@ exports.bookmarkFolderModify = (req, res) => {
             } 
         })
         .then(data => {
-            console.dir(data);
             console.log('북마크 폴더 이름 수정 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));
@@ -165,7 +166,6 @@ exports.bookmarkModify = (req, res) => { // 거의 안쓸 듯
             where: {id: req.params.bookmarkid} // userid와 혼동하지 말것
         })
         .then(data => {
-            console.dir(data);
             console.log('개별 북마크 수정 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));
@@ -190,7 +190,6 @@ exports.bookmarkFolderDelete = (req, res) => {
             }
         })
         .then(data => {
-            console.dir(data);
             console.log('북마크 폴더 삭제 성공\n');
             res.status(200);
             res.json(util.successTrue(data));
@@ -214,7 +213,6 @@ exports.bookmarkDelete = (req, res) => {
             }
         })
         .then(data => {
-            console.dir(data);
             console.log('개별 북마크 삭제 성공.\n');
             res.status(200);
             res.json(util.successTrue(data));

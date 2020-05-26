@@ -391,7 +391,6 @@ const malltail = async (pageNum, callback) => {
       });
 
       const data = ulList;
-      console.log(data);
       callback(null, data)
 
     }
@@ -469,7 +468,6 @@ const coolenjoy = async (pageNum, callback) => {
       });
 
       const data = ulList;
-      console.log(data);
       callback(null, data)
 
     }

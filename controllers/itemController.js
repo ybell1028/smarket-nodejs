@@ -92,7 +92,6 @@ const itemSpec = (search, info) => new Promise(async (resolve, reject) => {
             }
         );
 
-        console.log(response.status)
         const html = response.data;
         let ulList = [];
         const $ = cheerio.load(html);
@@ -160,7 +159,6 @@ const itemReview = (search, info, reviewcount) => new Promise(async (resolve, re
             }
         );
 
-        console.log(response.status)
         const html = response.data;
         let ulList = [];
         const $ = cheerio.load(html);
@@ -213,7 +211,6 @@ const itemNews = (search) => new Promise(async (resolve, reject) => {
 
         const html = response.data;
         const $ = cheerio.load(html);
-        console.log(response.status)
         let ulList = [];
         const $bodyList = $("[class ='thmb_con']")
         if (response.status == 200) {
@@ -306,7 +303,6 @@ const danawaSearch = (keyword) => new Promise(async (resolve, reject) => {
             }
         );
 
-        console.log(response.status)
         const html = response.data;
         let ulList = [];
         const $ = cheerio.load(html);
@@ -362,8 +358,6 @@ const prodData = (pcode) => new Promise(async (resolve, reject) => {
             }
         );
 
-
-        console.log(response.status)
         const html = response.data;
         const $ = cheerio.load(html);
         const scripts = $('script').filter(function () {

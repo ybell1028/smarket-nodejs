@@ -9,8 +9,6 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
 
     let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?' + querystring.stringify(req.query);
 
-    console.log(querystring.stringify(req.query));
-
     let options = {
         url: naverUrl,
         headers: {
@@ -29,7 +27,7 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
         else {
             console.dir(err);
             console.log('네이버 API 검색 실패');
-            res.status(response.statusCode);
+            res.status(403);
             res.json(util.successFalse(err, '네이버 API 검색 실패'));
         }
     });
