@@ -34,7 +34,7 @@ exports.search = (req, res) => {// function(req, res) 익명함수와 같음
 };
 
 exports.checkItem = (item) => new Promise((resolve, reject) => {
-    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title) + '&display=20';
+    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title) + '&display=100';
     let options = {
         url: naverUrl,
         headers: {
@@ -59,7 +59,11 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
             }
             if (!isSelling) {
                 console.log('item_id와 일치하는 상품 존재하지 않음.');
+                item.dataValues.item_lprice = null;
+                item.dataValues.item_link = null;
+                item.dataValues.item_image = 'https://i.imgur.com/w3pktp7.png';
                 item.dataValues.item_selling = false;
+                console.log(item.dataValues.item_title + "판매 종료.");
                 models.bookmark.update({
                     item_selling: false
                 }, {

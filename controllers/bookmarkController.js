@@ -98,16 +98,7 @@ exports.bookmarkLprice = (req, res) => {
 let isSelling = function (res, list, promises, bookmark, id, foldername) {
     for (let i = 0; i < list.length; i++) {
         setTimeout(() => {
-            if (!list[i].dataValues.item_selling) {
-                list[i].dataValues.item_lprice = null;
-                list[i].dataValues.item_link = null;
-                list[i].dataValues.item_image = 'https://i.imgur.com/w3pktp7.png';
-                promises.push(list[i]);
-                console.log(list[i].dataValues.item_title + "판매 종료.");
-            }
-            else {
-                promises.push(naverController.checkItem(list[i]));
-            }
+            promises.push(naverController.checkItem(list[i]));
             if (promises.length == list.length) {
                 Promise.all(promises)
                     .then(allCheckedList => {
