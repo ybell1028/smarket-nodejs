@@ -52,8 +52,6 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
                     console.log('item_id와 일치하는 상품 존재.');
                     isSelling = true;
                     item.dataValues.item_lprice = apiData[j].lprice;
-                    item.dataValues.item_link = apiData[j].link;
-                    item.dataValues.item_image = apiData[j].image;
                     break;
                 }
             }
@@ -65,7 +63,10 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
                 item.dataValues.item_selling = false;
                 console.log(item.dataValues.item_title + "판매 종료.");
                 models.bookmark.update({
-                    item_selling: false
+                    item_selling: false,
+                    item_alarm: false,
+                    item_image: 'https://i.imgur.com/w3pktp7.png',
+                    item_lprice: null,
                 }, {
                     where: {
                         id: item.dataValues.id, // 교체 필요
@@ -93,3 +94,4 @@ exports.checkItem = (item) => new Promise((resolve, reject) => {
         }
     })
 });
+

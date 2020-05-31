@@ -81,6 +81,16 @@ exports.phonenum = [
         .withMessage('유효하지 않은 전화번호 형식입니다.')
 ]
 
+exports.id = [
+    check('id')
+        .not()
+        .isEmpty()
+        .withMessage('ID가 필요합니다.')
+        .bail()
+        .isInt()
+        .withMessage('ID는 Integer입니다.')
+]
+
 exports.folder_name = [
     check('folder_name')
         .not()
@@ -88,11 +98,59 @@ exports.folder_name = [
         .withMessage('폴더명을 입력해주세요.')
 ]
 
+exports.item_selling = [
+    check('item_selling')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 판매 상태가 필요합니다.')
+        .bail()
+        .isBoolean()
+        .withMessage('아이템 판매 상태는 Boolean입니다.')
+]
+
+exports.item_alarm = [
+    check('item_alarm')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 알람 상태가 필요합니다.')
+        .bail()
+        .isBoolean()
+        .withMessage('아이템 알람 상태는 Boolean입니다.')
+]
+
 exports.item_title = [
     check('item_title')
         .not()
         .isEmpty()
         .withMessage('아이템 타이틀이 필요합니다.')
+]
+
+exports.item_link = [
+    check('item_link')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 링크가 필요합니다.')
+]
+
+exports.item_image = [
+    check('item_image')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 이미지 링크가 필요합니다.')
+]
+
+exports.item_lprice = [
+    check('item_lprice')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 최저가 정보가 필요합니다.')
+]
+
+exports.item_mallname = [
+    check('item_mallname')
+        .not()
+        .isEmpty()
+        .withMessage('아이템 판매처 정보가 필요합니다.')
 ]
 
 exports.item_id = [
@@ -108,18 +166,8 @@ exports.item_type = [
         .isEmpty()
         .withMessage('아이템 타입이 필요합니다.')
         .bail()
-        .isInt()
-        .withMessage('아이템 타입은 Integer입니다.')
-]
-
-exports.item_selling = [
-    check('item_selling')
-        .not()
-        .isEmpty()
-        .withMessage('아이템 판매여부가 필요합니다.')
-        .bail()
-        .isBoolean()
-        .withMessage('아이템 판매여부는 Boolean입니다.')
+        .isString()
+        .withMessage('아이템 타입은 String입니다.')
 ]
 
 exports.before_name = [

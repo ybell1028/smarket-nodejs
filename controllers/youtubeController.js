@@ -1,69 +1,95 @@
-var { google } = require('googleapis');
-var request = require('request');
-var querystring = require('querystring');
-var util = require('../middleware/util');
-const crawlingController = require('./crawlingController.js');
-const YOUTUBE_API_KEY = 'AIzaSyCe41JVtYAPPC8a5yOQZJkwuKFLJMGHT7A';
-// const YOUTUBE_API_KEY = 'AIzaSyC7YY58-0d5LffCoYBHUlYZCqFKOJawxwQ';
+const request = require('request');
+const querystring = require('querystring');
+const util = require('../middleware/util');
+const models = require("../models");
+const NAVER_CLIENT_ID = 'kgCoE_vLTgvV6CSFYv7h';
+const NAVER_CLIENT_SECRET = 'pIsycgdYAm';
 
-exports.search = (req, res) => {
+exports.search = (req, res) => {// function(req, res) 익명함수와 같음
 
-    var options = {
-        q: req.query.query,
-        part: "snippet",
-        key: YOUTUBE_API_KEY,
-        type: "video",
-        // maxResults: req.query.maxResults,
-        regionCode: "KR"
-    };
+    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?' + querystring.stringify(req.query);
 
-    var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
+    let options = {
+        url: naverUrl,
+        headers: {
+            'X-Naver-Client-Id': NAVER_CLIENT_ID,
+            'X-Naver-Client-Secret': NAVER_CLIENT_SECRET
+        }
+    }
 
-    request.get(youtubeUrl, function (err, response, body) {
-        if (!err && response.statusCode == 200) {
-            console.log('유튜브 API 검색 성공');
+    request.get(options, function (err, response, body) { // res, response 중복 주의
+        if (!err && response.statusCode === 200) {
+            console.log('네이버 API 검색 성공');
             let data = JSON.parse(body);
             res.status(response.statusCode);
             res.json(util.successTrue(data));
         }
         else {
             console.dir(err);
-            console.log('유튜브 API 검색 실패');
-            res.status(response.statusCode);
-            res.json(util.successFalse(err, '유튜브 API 검색 실패'));
+            console.log('네이버 API 검색 실패');
+            res.status(403);
+            res.json(util.successFalse(err, '네이버 API 검색 실패'));
         }
     });
-}
+};
 
-// exports.searchToTitle = (req) => new Promise((resolve, reject) => {
-//     var options = {
-//         q: req.query.query,
-//         part: "snippet",
-//         key: YOUTUBE_API_KEY,
-//         type: "video",
-//         // maxResults: req.query.maxResults,
-//         regionCode: "KR"
-//     };
-
-//     var youtubeUrl = 'https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(options);
-
-//     request.get(youtubeUrl, async function (err, response, body) {
-//         if (!err && response.statusCode == 200) {
-//             let searchResult = [];
-//             let spec = await crawlingController.itemSpec(req.query.query);
-//             searchResult.push(spec[0]);
-//             for (let i = 0; i < JSON.parse(body).items.length; i++) {
-//                 searchResult.push(JSON.parse(body).items[i]);
-//             }
-
-//             console.log('유튜브 API 검색 성공');
-
-//             resolve(searchResult);
-//         }
-//         else {
-//             console.dir(err);
-//             console.log('유튜브 API 검색 실패');
-//             reject(err);
-//         }
-//     });
-// });
+exports.checkItem = (item) => new Promise((resolve, reject) => {
+    let naverUrl = 'https://openapi.naver.com/v1/search/shop.json?query=' + encodeURI(item.dataValues.item_title) + '&display=20';
+    let options = {
+        url: naverUrl,
+        headers: {
+            'X-Naver-Client-Id': NAVER_CLIENT_ID,
+            'X-Naver-Client-Secret': NAVER_CLIENT_SECRET
+        }
+    }
+    request.get(options, (err, response, body) => { // API에 요청
+        let isSelling = false;
+        if (!err && response.statusCode === 200) {
+            console.log(item.dataValues.item_title + ' 키워드 API 검색 성공.');
+            let apiData = JSON.parse(body).items;
+            for (let j = 0; j < apiData.length; j++) { // apiData.length = items JSON 배열의 길이
+                if (apiData[j].productId === item.dataValues.item_id) {
+                    console.log('item_id와 일치하는 상품 존재.');
+                    isSelling = true;
+                    item.dataValues.item_lprice = apiData[j].lprice;
+                    item.dataValues.item_link = apiData[j].link;
+                    item.dataValues.item_image = apiData[j].image;
+                    break;
+                }
+            }
+            if (!isSelling) {
+                console.log('item_id와 일치하는 상품 존재하지 않음.');
+                item.dataValues.item_lprice = null;
+                item.dataValues.item_link = null;
+                item.dataValues.item_image = 'https://i.imgur.com/w3pktp7.png';
+                item.dataValues.item_selling = false;
+                console.log(item.dataValues.item_title + "판매 종료.");
+                models.bookmark.update({
+                    item_selling: false
+                }, {
+                    where: {
+                        id: item.dataValues.id, // 교체 필요
+                        user_id: item.dataValues.user_id, // userid와 혼동하지 말것
+                    }
+                })
+                .then(data => {
+                    console.log('item_selling 변경 완료.\n');
+                    resolve(item);
+                })
+                .catch(err => {
+                   console.log('item_selling 변경 실패.\n');
+                   reject(err);
+                });
+            }
+            else {
+                console.log('item 정보 업데이트 완료.\n');
+                resolve(item);
+            }
+        }
+        else {
+            console.dir(err);
+            console.log(item.dataValues.item_title + ' 키워드 API 검색 실패.\n');
+            reject(err);
+        }
+    })
+});

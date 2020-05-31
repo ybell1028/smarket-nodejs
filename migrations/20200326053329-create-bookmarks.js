@@ -16,22 +16,67 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            item_id: {
-                type: Sequelize.STRING,
+            item_selling: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: true,
+                allowNull: false
+            },
+            item_alarm: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: true,
                 allowNull: false
             },
             item_title: {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            item_type: {
-                type: Sequelize.INTEGER,
+            item_link: {
+                type: Sequelize.STRING,
                 allowNull: false
             },
-            item_selling: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: true,
+            item_image: {
+                type: Sequelize.STRING,
                 allowNull: false
+            },
+            item_lprice: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_mallname: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
+            item_id: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
+            item_type: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
+            item_brand: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_maker: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_category1: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_category2: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_category3: {
+                type: Sequelize.STRING,
+                allowNull: true
+            },
+            item_category4: {
+                type: Sequelize.STRING,
+                allowNull: true
             }
         });
     },

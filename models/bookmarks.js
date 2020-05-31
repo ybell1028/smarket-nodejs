@@ -9,23 +9,68 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    item_id: {
-      type: DataTypes.STRING,
+    item_selling: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      allowNull: false
+    },
+    item_alarm: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
       allowNull: false
     },
     item_title: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    item_type: {
-      type: DataTypes.INTEGER,
+    item_link: {
+      type: DataTypes.STRING,
       allowNull: false
     },
-    item_selling: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    item_image: {
+      type: DataTypes.STRING,
       allowNull: false
-    }
+    },
+    item_lprice: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_mallname: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    item_id: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    item_type: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    item_brand: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_maker: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_category1: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_category2: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_category3: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    item_category4: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
   }, {
     underscored: true,
     freezeTableName: true, //Sequelize는 define method의 첫 번째 파라미터 값으로 tablename을 자동 변환하는데, 이 옵션의 값이 true이면 변환 작업을 하지 않도록 합니다.

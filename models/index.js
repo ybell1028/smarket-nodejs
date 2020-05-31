@@ -16,7 +16,7 @@ var sequelize = new Sequelize(
     host: 'localhost',      // 호스트
     dialect: 'mysql',    // DB종류
     pool: {                 // connection pool
-      max: 10,
+      max: 1000,
       min: 0,
       idle: 10000
     }
