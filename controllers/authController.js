@@ -22,7 +22,8 @@ exports.login = async (req, res) => {
                 console.log(data.dataValues.user_id + ' 로그인 성공.');
                 var tokens = {
                     accessToken: await util.generateAccessToken(req, res),
-                    refreshToken: await util.generateRefreshToken(req, res)
+                    refreshToken: await util.generateRefreshToken(req, res),
+                    nickname: data.dataValues.nickname
                 }
                 console.log('토큰 생성됨.\n');
                 res.cookie('accessToken', tokens.accessToken, {

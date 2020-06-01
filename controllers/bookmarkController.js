@@ -113,7 +113,9 @@ exports.folderList = (req, res) => {
     console.log('폴더 리스트 조회 호출됨.');
     models.folder
         .findAll({
-            user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
+            where :{
+                user_id: req.body.user_id, // 토큰에 딸려서 옴, JSON 데이터 작성할 필요 X
+            }
         })
         .then(data => {
             res.status(201);
