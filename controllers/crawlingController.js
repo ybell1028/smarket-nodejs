@@ -33,7 +33,7 @@ exports.ppomppu = (req, res) => {
 
 const ppomppu = async (page, callback) => {
   try {
-    link = "http://www.ppomppu.co.kr/zboard/zboard.php?" + page
+    let link = "http://www.ppomppu.co.kr/zboard/zboard.php?" + page
     const response = await axios({
       method: "GET",
       url: link,
@@ -56,13 +56,13 @@ const ppomppu = async (page, callback) => {
     });
     if (response.status == 200) {
       const html = iconv.decode(response.data, "euc-kr").toString();
-      let ulList = [];
+      let ppomppulist = [];
       const $ = cheerio.load(html);
       const $bodyList = $("[class$='list1']")
       const $bodyList0 = $("[class$='list0']")
 
       $bodyList.each(function (i, elem) {
-        ulList[2 * i] = {
+        ppomppulist[2 * i] = {
           // id: $(this).find('td:nth-child(1)').text().trim(),
           category: $(this).find('nobr.han4.list_vspace').text().trim(),
           title: $(this).find('font').text().trim(),
@@ -71,13 +71,13 @@ const ppomppu = async (page, callback) => {
           hit: $(this).find('td:nth-child(7)').text(),
           time: $(this).find('td:nth-child(5) > nobr').text().trim()
         };
-        if (ulList[2 * i].time.match(':')) {
-          ulList[2 * i].time = ulList[2 * i].time.slice(0, 5)
+        if (ppomppulist[2 * i].time.match(':')) {
+          ppomppulist[2 * i].time = ppomppulist[2 * i].time.slice(0, 5)
         }
       });
 
       $bodyList0.each(function (i, elem) {
-        ulList[2 * i + 1] = {
+        ppomppulist[2 * i + 1] = {
           // id: $(this).find('td:nth-child(1)').text().trim(),
           category: $(this).find('nobr.han4.list_vspace').text().trim(),
           title: $(this).find('font').text().trim(),
@@ -86,15 +86,15 @@ const ppomppu = async (page, callback) => {
           hit: $(this).find('td:nth-child(7)').text(),
           time: $(this).find('td:nth-child(5) > nobr').text().trim()
         };
-        if (ulList[2 * i + 1].time.match(':')) {
-          ulList[2 * i + 1].time = ulList[2 * i + 1].time.slice(0, 5)
+        if (ppomppulist[2 * i + 1].time.match(':')) {
+          ppomppulist[2 * i + 1].time = ppomppulist[2 * i + 1].time.slice(0, 5)
         }
       });
-      // console.log(ulList)
+      // console.log(ppomppulist)
       // sJoon = []
-      // sJoon[j] = JSON.stringify(ulList)
+      // sJoon[j] = JSON.stringify(ppomppulist)
       // console.log(sJoon)
-      const data = ulList;
+      const data = ppomppulist;
       callback(null, data);
 
     }
@@ -127,15 +127,15 @@ exports.ruliweb = (req, res) => {
 
 
 const ruliweb = (pageNum, callback) => {
-  url = "https://bbs.ruliweb.com/market/board/1020?page=" + String(pageNum);
+  let url = "https://bbs.ruliweb.com/market/board/1020?page=" + String(pageNum);
   request(url, (err, response, body) => {
     if (err) callback(err, null);
-    let ulList = [];
+    let ruliwebList = [];
     const $ = cheerio.load(body);
     const $bodyList = $("[class$='table_body']")
 
     $bodyList.each(function (i, elem) {
-      ulList[i] = {
+      ruliwebList[i] = {
         // id: $(this).find('td.id').text().trim(),
         category: $(this).find('td.divsn a').text().trim(),
         title: $(this).find('td a.deco').text().trim(),
@@ -144,11 +144,11 @@ const ruliweb = (pageNum, callback) => {
         hit: $(this).find('td.hit span').text(),
         time: $(this).find('td.time').text().trim()
       };
-      if (ulList[i].time.length === 10) {
-        ulList[i].time = ulList[i].time.replace(/\./g, '/').slice(2, 10)
+      if (ruliwebList[i].time.length === 10) {
+        ruliwebList[i].time = ruliwebList[i].time.replace(/\./g, '/').slice(2, 10)
       }
     });
-    const data = ulList;
+    const data = ruliwebList;
     callback(null, data);
   })
 };
@@ -176,7 +176,7 @@ exports.fmkorea = (req, res) => {
 
 const fmkorea = async (pageNum, callback) => {
   try {
-    link = "https://www.fmkorea.com/index.php?mid=hotdeal&listStyle=list&page=" + pageNum
+    let link = "https://www.fmkorea.com/index.php?mid=hotdeal&listStyle=list&page=" + pageNum
     const response = await axios({
       method: "GET",
       url: link,
@@ -201,12 +201,12 @@ const fmkorea = async (pageNum, callback) => {
 
     if (response.status == 200) {
       const html = response.data;
-      let ulList = [];
+      let fmkoreaList = [];
       const $ = cheerio.load(html);
       const $bodyList = $("#bd_1196365581_0 > div > table > tbody > tr").not('tr.notice')
 
       $bodyList.each(function (i, elem) {
-        ulList[i] = {
+        fmkoreaList[i] = {
 
           category: $(this).find('td.cate > span > a').text().trim(),
           // title: $(this).find('td.title> a.hx').text().trim().split(') ')[0] + ')',
@@ -217,12 +217,12 @@ const fmkorea = async (pageNum, callback) => {
           time: $(this).find('td.time').text().trim(),
 
         };
-        if (ulList[i].time.length === 10) {
-          ulList[i].time = ulList[i].time.replace(/\./g, '/').slice(2, 10)
+        if (fmkoreaList[i].time.length === 10) {
+          fmkoreaList[i].time = fmkoreaList[i].time.replace(/\./g, '/').slice(2, 10)
         }
       });
 
-      const data = ulList;
+      const data = fmkoreaList;
       callback(null, data)
 
     }
@@ -254,7 +254,7 @@ exports.clien = (req, res) => {
 
 const clien = async (pageNum, callback) => {
   try {
-    link = "https://www.clien.net/service/board/jirum?&od=T31&po=" + (pageNum - 1)
+    let link = "https://www.clien.net/service/board/jirum?&od=T31&po=" + (pageNum - 1)
     const response = await axios({
       method: "GET",
       url: link,
@@ -280,12 +280,12 @@ const clien = async (pageNum, callback) => {
 
     if (response.status == 200) {
       const html = response.data;
-      let ulList = [];
+      let clienList = [];
       const $ = cheerio.load(html);
       const $bodyList = $("#div_content > div.list_content > div.contents_jirum > div.list_item:not(.blocked)")
 
       $bodyList.each(function (i, elem) {
-        ulList[i] = {
+        clienList[i] = {
 
           category: $(this).find('div.list_title > div > a').text().trim(),
           title: $(this).find('div.list_title > span > a').text().trim().replace(/\t/g, '').split('\n')[0],
@@ -295,15 +295,15 @@ const clien = async (pageNum, callback) => {
           time: $(this).find('div.list_time > span').text().trim().slice(0, 5),
 
         };
-        // if (ulList[i].hit.match('k')) {
-        //   ulList[i].hit = ulList[i].hit.replace(/ k/g, '000').replace(/\./g, '')
+        // if (clienList[i].hit.match('k')) {
+        //   clienList[i].hit = clienList[i].hit.replace(/ k/g, '000').replace(/\./g, '')
         // }
-        if (ulList[i].time.match('-')) {
-          ulList[i].time = $(this).find('div.list_time > span').text().trim().slice(7, 9) + '/' + ulList[i].time.replace(/-/g, '/')
+        if (clienList[i].time.match('-')) {
+          clienList[i].time = $(this).find('div.list_time > span').text().trim().slice(7, 9) + '/' + clienList[i].time.replace(/-/g, '/')
         }
       });
 
-      const data = ulList;
+      const data = clienList;
       console.log(data);
       callback(null, data)
 
@@ -336,7 +336,7 @@ exports.malltail = (req, res) => {
 
 const malltail = async (pageNum, callback) => {
   try {
-    link = "https://post.malltail.com/hotdeals/index/keyword:/page:" + pageNum
+    let link = "https://post.malltail.com/hotdeals/index/keyword:/page:" + pageNum
     const response = await axios({
       method: "GET",
       url: link,
@@ -363,14 +363,14 @@ const malltail = async (pageNum, callback) => {
 
     if (response.status == 200) {
       const html = response.data;
-      let ulList = [];
+      let malltailList = [];
       const $ = cheerio.load(html);
       const $bodyList = $("#container > div.hotdeal-wrap.event_area > table > tbody > tr").not('.notice')
       p = 0
       $bodyList.each(function (i, elem) {
         j = i % 7
         if (j !== 0 && j !== 1) {
-          ulList[p] = {
+          malltailList[p] = {
 
             category: $(this).find('td:nth-child(1)').text().trim(),
             title: $(this).find('td.title > a').text(),
@@ -380,17 +380,17 @@ const malltail = async (pageNum, callback) => {
             time: $(this).find('td:nth-child(7)').text().trim(),
 
           };
-          if (ulList[p].time.match('-')) {
-            ulList[p].time = ulList[p].time.replace(/-/g, '/').slice(2, 10)
+          if (malltailList[p].time.match('-')) {
+            malltailList[p].time = malltailList[p].time.replace(/-/g, '/').slice(2, 10)
           }
-          else if (ulList[p].time.match(':')) {
-            ulList[p].time = ulList[p].time.slice(0, 5)
+          else if (malltailList[p].time.match(':')) {
+            malltailList[p].time = malltailList[p].time.slice(0, 5)
           }
           p = p + 1
         }
       });
 
-      const data = ulList;
+      const data = malltailList;
       callback(null, data)
 
     }
@@ -422,7 +422,7 @@ exports.coolenjoy = (req, res) => {
 
 const coolenjoy = async (pageNum, callback) => {
   try {
-    link = "http://www.coolenjoy.net/bbs/jirum/p" + pageNum
+    let link = "http://www.coolenjoy.net/bbs/jirum/p" + pageNum
     const response = await axios({
       method: "GET",
       url: link,
@@ -444,12 +444,12 @@ const coolenjoy = async (pageNum, callback) => {
 
     if (response.status == 200) {
       const html = response.data;
-      let ulList = [];
+      let coolenjoyList = [];
       const $ = cheerio.load(html);
       const $bodyList = $("#fboardlist > div > table > tbody > tr").not('.bo_notice')
 
       $bodyList.each(function (i, elem) {
-        ulList[i] = {
+        coolenjoyList[i] = {
 
           category: $(this).find('td.td_num').text().trim(),
           title: $(this).find('td.td_subject > a').text().split('댓')[0].trim(),
@@ -459,15 +459,15 @@ const coolenjoy = async (pageNum, callback) => {
           time: $(this).find('td.td_date').text().trim(),
 
         };
-        if (ulList[i].hit.match('k')) {
-          ulList[i].hit = ulList[i].hit.replace(/k/g, '000').replace(/\./g, '')
+        if (coolenjoyList[i].hit.match('k')) {
+          coolenjoyList[i].hit = coolenjoyList[i].hit.replace(/k/g, '000').replace(/\./g, '')
         }
-        if (ulList[i].time.match('-')) {
-          ulList[i].time = ulList[i].time.replace(/-/g, '/')
+        if (coolenjoyList[i].time.match('-')) {
+          coolenjoyList[i].time = coolenjoyList[i].time.replace(/-/g, '/')
         }
       });
 
-      const data = ulList;
+      const data = coolenjoyList;
       callback(null, data)
 
     }

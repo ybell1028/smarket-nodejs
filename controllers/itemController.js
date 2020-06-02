@@ -40,7 +40,7 @@ exports.itemDetail = async (req, res) => {
     else {
         console.log('상품 상세 정보 조회 실패.\n');
         res.status(200);
-        res.json('상품 상세 정보가 없습니다.')
+        res.json(util.successTrueDetail(null, null, null, null))
     }
 }
 
