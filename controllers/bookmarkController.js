@@ -181,7 +181,7 @@ let isSelling = function (res, list, promises, id, foldername) {
                         res.json(util.successFalse(err, '사용자 ' + id + '의 북마크 리스트 조회 실패.'));
                     })
             }
-        }, 120 * i)
+        }, 100 * i)
     }
 }
 
@@ -215,7 +215,7 @@ let isChanged = function (res, list, promises, id) {
                         res.json(util.successFalse(err, '사용자 ' + id + '의 최저가 정보 조회 실패.'));
                     })
             }
-        }, 50 * i)
+        }, 200 * i)
     }
 }
 

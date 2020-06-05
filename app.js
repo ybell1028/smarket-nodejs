@@ -48,41 +48,41 @@ let server = http.createServer(app);
 // 멀티 스레드
 /* cluster(multithread) setting */
 
-// if (cluster.isMaster) {
+if (cluster.isMaster) {
 
-//     for (let i = 1; i <= numCPUs; i++) {
-//         console.log('worker process create[' + i + ']');
-//         cluster.fork();
-//     }
+    for (let i = 1; i <= numCPUs; i++) {
+        console.log('worker process create[' + i + ']');
+        cluster.fork();
+    }
 
-//     cluster.on('listening', function(worker, address) {
-//         console.log("Worker " + worker.id + " is now connected to " + address.address + ":" + address.port);
-//     });
+    cluster.on('listening', function(worker, address) {
+        console.log("Worker " + worker.id + " is now connected to " + address.address + ":" + address.port);
+    });
 
-//     cluster.on('exit',function(worker, code, signal){
-//         console.log(`worker ${worker.process.pid} died`);
-//         cluster.fork();
-//     });
+    cluster.on('exit',function(worker, code, signal){
+        console.log(`worker ${worker.process.pid} died`);
+        cluster.fork();
+    });
 
-// } else {
-//     server.listen(app.get('port'), ip, function () {
-//         console.log('slave server '+ cluster.worker.process.pid);
-//     });
-//     server.on('connection', function (socket) {
-//         console.log('클라이언트가 접속했습니다.');
-//     });
-//     console.log('port : ' + app.get('port'));
-//     console.log('server is running');
-// }
+} else {
+    server.listen(app.get('port'), ip, function () {
+        console.log('slave server '+ cluster.worker.process.pid);
+    });
+    server.on('connection', function (socket) {
+        console.log('클라이언트가 접속했습니다.');
+    });
+    console.log('port : ' + app.get('port'));
+    console.log('server is running');
+}
 
 
 // 싱글 스레드
 
-server.listen(app.get('port'), ip, function () {
-    // console.log('ip : ' + ip + ' | port : ' + app.get('port'));
-    console.log('server is running');
-});
+// server.listen(app.get('port'), ip, function () {
+//     // console.log('ip : ' + ip + ' | port : ' + app.get('port'));
+//     console.log('server is running');
+// });
 
-server.on('connection', function (socket) {
-    console.log('클라이언트가 접속했습니다.');
-});
+// server.on('connection', function (socket) {
+//     console.log('클라이언트가 접속했습니다.');
+// });
