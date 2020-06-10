@@ -77,11 +77,11 @@ header(x-access-token)
     * DB에 저장된 Firebase Cloud Message Token 조회  
 header(x-access-token)
 
-## api/item
+### api/item
 * __GET__ /detail  
     * 상품 상세정보 조회
 
-## api/naver
+### api/naver
 * __GET__ /search  
     * 네이버 쇼핑 API 검색
 
